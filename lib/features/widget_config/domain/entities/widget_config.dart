@@ -18,6 +18,7 @@ class WidgetConfig extends Equatable {
   final bool use24HourFormat;
   final NumeralStyle numeralStyle;
   final bool boldText;
+  final bool showTranslation;
 
   const WidgetConfig({
     required this.font,
@@ -31,6 +32,7 @@ class WidgetConfig extends Equatable {
     required this.use24HourFormat,
     required this.numeralStyle,
     required this.boldText,
+    required this.showTranslation,
   });
 
   factory WidgetConfig.initial() => const WidgetConfig(
@@ -45,6 +47,7 @@ class WidgetConfig extends Equatable {
     use24HourFormat: true,
     numeralStyle: NumeralStyle.kanji,
     boldText: false,
+    showTranslation: true,
   );
 
   WidgetConfig copyWith({
@@ -59,6 +62,7 @@ class WidgetConfig extends Equatable {
     bool? use24HourFormat,
     NumeralStyle? numeralStyle,
     bool? boldText,
+    bool? showTranslation,
   }) {
     return WidgetConfig(
       font: font ?? this.font,
@@ -72,6 +76,7 @@ class WidgetConfig extends Equatable {
       use24HourFormat: use24HourFormat ?? this.use24HourFormat,
       numeralStyle: numeralStyle ?? this.numeralStyle,
       boldText: boldText ?? this.boldText,
+      showTranslation: showTranslation ?? this.showTranslation,
     );
   }
 
@@ -99,5 +104,6 @@ class WidgetConfig extends Equatable {
     use24HourFormat,
     numeralStyle,
     boldText,
+    showTranslation,
   ];
 }

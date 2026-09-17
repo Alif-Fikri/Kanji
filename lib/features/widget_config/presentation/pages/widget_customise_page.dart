@@ -8,6 +8,7 @@ import '../../../../core/theme/kanji_palette.dart';
 import '../../../../core/widgets/section_header.dart';
 import '../../../../core/widgets/washi_background.dart';
 import '../../../daily_kanji/data/daily_kanji_cache.dart';
+import '../../../daily_quote/data/quote_cache.dart';
 import '../../domain/entities/widget_config.dart';
 import '../../domain/entities/widget_kind.dart';
 import '../../domain/entities/widget_target.dart';
@@ -47,6 +48,11 @@ class _WidgetCustomisePageState extends State<WidgetCustomisePage> {
     if (widget.target.isTemplate) _loadPlaced();
     if (DailyKanjiCache.entries == null) {
       DailyKanjiCache.warm().then((_) {
+        if (mounted) setState(() {});
+      });
+    }
+    if (QuoteCache.entries == null) {
+      QuoteCache.warm().then((_) {
         if (mounted) setState(() {});
       });
     }
@@ -243,57 +249,80 @@ class _WidgetCustomisePageState extends State<WidgetCustomisePage> {
                     ],
                   ),
                 ),
-                const SizedBox(height: 16),
-                SettingsCard(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      const SectionHeader(label: 'Clock format'),
-                      SegmentedChoice<NumeralStyle>(
-                        values: NumeralStyle.values,
-                        selected: config.numeralStyle,
-                        labelOf: (value) => value == NumeralStyle.kanji
-                            ? 'Kanji  十時'
-                            : 'Numbers  10時',
-                        onSelected: (style) =>
-                            _update(config.copyWith(numeralStyle: style)),
-                      ),
-                      const SizedBox(height: 12),
-                      SegmentedChoice<bool>(
-                        values: const [true, false],
-                        selected: config.use24HourFormat,
-                        labelOf: (value) => value ? '24-hour' : '12-hour',
-                        onSelected: (value) =>
-                            _update(config.copyWith(use24HourFormat: value)),
-                      ),
-                      const SizedBox(height: 16),
-                      OptionSwitch(
-                        title: 'Show date',
-                        subtitle: 'Second line with the month and day',
-                        value: config.showDate,
-                        onChanged: (value) =>
-                            _update(config.copyWith(showDate: value)),
-                      ),
-                      OptionSwitch(
-                        title: 'Show weekday',
-                        subtitle: 'Adds the day of the week, e.g. （水）',
-                        value: config.showWeekday,
-                        onChanged: (value) =>
-                            _update(config.copyWith(showWeekday: value)),
-                      ),
-                      OptionSwitch(
-                        title: 'Show seconds',
-                        subtitle:
-                            'Live in this preview. On the home screen Android '
-                            'only lets widgets refresh once a minute, so the '
-                            'seconds there update every minute.',
-                        value: config.showSeconds,
-                        onChanged: (value) =>
-                            _update(config.copyWith(showSeconds: value)),
-                      ),
-                    ],
+                if (target.kind == WidgetKind.clock) ...[
+                  const SizedBox(height: 16),
+                  SettingsCard(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        const SectionHeader(label: 'Clock format'),
+                        SegmentedChoice<NumeralStyle>(
+                          values: NumeralStyle.values,
+                          selected: config.numeralStyle,
+                          labelOf: (value) => value == NumeralStyle.kanji
+                              ? 'Kanji  十時'
+                              : 'Numbers  10時',
+                          onSelected: (style) =>
+                              _update(config.copyWith(numeralStyle: style)),
+                        ),
+                        const SizedBox(height: 12),
+                        SegmentedChoice<bool>(
+                          values: const [true, false],
+                          selected: config.use24HourFormat,
+                          labelOf: (value) => value ? '24-hour' : '12-hour',
+                          onSelected: (value) =>
+                              _update(config.copyWith(use24HourFormat: value)),
+                        ),
+                        const SizedBox(height: 16),
+                        OptionSwitch(
+                          title: 'Show date',
+                          subtitle: 'Second line with the month and day',
+                          value: config.showDate,
+                          onChanged: (value) =>
+                              _update(config.copyWith(showDate: value)),
+                        ),
+                        OptionSwitch(
+                          title: 'Show weekday',
+                          subtitle: 'Adds the day of the week, e.g. （水）',
+                          value: config.showWeekday,
+                          onChanged: (value) =>
+                              _update(config.copyWith(showWeekday: value)),
+                        ),
+                        OptionSwitch(
+                          title: 'Show seconds',
+                          subtitle:
+                              'Live in this preview. On the home screen Android '
+                              'only lets widgets refresh once a minute, so the '
+                              'seconds there update every minute.',
+                          value: config.showSeconds,
+                          onChanged: (value) =>
+                              _update(config.copyWith(showSeconds: value)),
+                        ),
+                      ],
+                    ),
                   ),
-                ),
+                ],
+                if (target.kind == WidgetKind.quote) ...[
+                  const SizedBox(height: 16),
+                  SettingsCard(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        const SectionHeader(label: 'Quote'),
+                        OptionSwitch(
+                          title: 'Show translation',
+                          subtitle:
+                              'Show the English meaning under the Japanese '
+                              'quote. Turn off for Japanese only.',
+                          value: config.showTranslation,
+                          onChanged: (value) => _update(
+                            config.copyWith(showTranslation: value),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ],
                 const SizedBox(height: 16),
                 SettingsCard(
                   child: Column(

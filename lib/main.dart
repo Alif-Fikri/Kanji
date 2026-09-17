@@ -6,6 +6,7 @@ import 'package:hive_flutter/hive_flutter.dart';
 import 'package:home_widget/home_widget.dart';
 import 'core/theme/app_theme.dart';
 import 'features/daily_kanji/data/daily_kanji_cache.dart';
+import 'features/daily_quote/data/quote_cache.dart';
 import 'features/widget_config/data/kanji_widget_background_callback.dart';
 import 'features/widget_config/data/kanji_widget_hive_bootstrap.dart';
 import 'features/widget_config/data/kanji_widget_updater.dart';
@@ -22,6 +23,7 @@ Future<void> main() async {
   await Hive.initFlutter();
   registerWidgetConfigHiveAdapters();
   await DailyKanjiCache.warm();
+  await QuoteCache.warm();
   await HomeWidget.registerInteractivityCallback(kanjiClockBackgroundCallback);
 
   final configureId = await HomeWidget.initiallyLaunchedFromHomeWidgetConfigure();

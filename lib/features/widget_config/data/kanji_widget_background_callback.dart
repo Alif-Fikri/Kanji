@@ -2,6 +2,7 @@ import 'package:flutter/widgets.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 
 import '../../daily_kanji/data/daily_kanji_cache.dart';
+import '../../daily_quote/data/quote_cache.dart';
 import 'kanji_widget_hive_bootstrap.dart';
 import 'kanji_widget_updater.dart';
 import 'widget_config_local_data_source.dart';
@@ -14,6 +15,7 @@ Future<void> kanjiClockBackgroundCallback(Uri? uri) async {
     registerWidgetConfigHiveAdapters();
   }
   await DailyKanjiCache.warm();
+  await QuoteCache.warm();
 
   try {
     await refreshInstalledWidgets(WidgetConfigLocalDataSource().load);

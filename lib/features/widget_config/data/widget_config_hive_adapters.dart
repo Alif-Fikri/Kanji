@@ -65,13 +65,14 @@ class WidgetConfigAdapter extends TypeAdapter<WidgetConfig> {
       use24HourFormat: fields[8] as bool? ?? fallback.use24HourFormat,
       numeralStyle: fields[9] as NumeralStyle? ?? fallback.numeralStyle,
       boldText: fields[10] as bool? ?? fallback.boldText,
+      showTranslation: fields[11] as bool? ?? fallback.showTranslation,
     );
   }
 
   @override
   void write(BinaryWriter writer, WidgetConfig obj) {
     writer
-      ..writeByte(11)
+      ..writeByte(12)
       ..writeByte(0)
       ..write(obj.font)
       ..writeByte(1)
@@ -93,6 +94,8 @@ class WidgetConfigAdapter extends TypeAdapter<WidgetConfig> {
       ..writeByte(9)
       ..write(obj.numeralStyle)
       ..writeByte(10)
-      ..write(obj.boldText);
+      ..write(obj.boldText)
+      ..writeByte(11)
+      ..write(obj.showTranslation);
   }
 }

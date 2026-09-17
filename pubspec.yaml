@@ -66,6 +66,7 @@ flutter:
 
   assets:
     - assets/data/jlpt_n5_kanji.json
+    - assets/data/japanese_quotes.json
 
   fonts:
     - family: NotoSansJP

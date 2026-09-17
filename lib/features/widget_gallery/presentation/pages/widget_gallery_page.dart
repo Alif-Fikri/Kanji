@@ -5,6 +5,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 
 import '../../../../core/widgets/washi_background.dart';
 import '../../../daily_kanji/data/daily_kanji_cache.dart';
+import '../../../daily_quote/data/quote_cache.dart';
 import '../../../widget_config/domain/entities/widget_kind.dart';
 import '../../../widget_config/domain/entities/widget_target.dart';
 import '../../../widget_config/presentation/bloc/widget_config_bloc.dart';
@@ -33,6 +34,11 @@ class _WidgetGalleryPageState extends State<WidgetGalleryPage> {
     });
     if (DailyKanjiCache.entries == null) {
       DailyKanjiCache.warm().then((_) {
+        if (mounted) setState(() {});
+      });
+    }
+    if (QuoteCache.entries == null) {
+      QuoteCache.warm().then((_) {
         if (mounted) setState(() {});
       });
     }
