@@ -54,15 +54,6 @@ class KanjiClockWidgetProvider : HomeWidgetProvider() {
         ).send()
     }
 
-    override fun onDeleted(context: Context, appWidgetIds: IntArray) {
-        super.onDeleted(context, appWidgetIds)
-        val ids = appWidgetIds.joinToString(",")
-        HomeWidgetBackgroundIntent.getBroadcast(
-            context,
-            Uri.parse("kanjiwidget://deleted?widgetIds=$ids"),
-        ).send()
-    }
-
     override fun onEnabled(context: Context) {
         super.onEnabled(context)
         KanjiClockAlarmScheduler.scheduleNextMinute(context)

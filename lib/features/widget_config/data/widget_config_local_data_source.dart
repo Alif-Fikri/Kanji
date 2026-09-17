@@ -34,9 +34,4 @@ class WidgetConfigLocalDataSource {
     final box = await _openBox();
     await box.put(target.storageKey, config);
   }
-
-  Future<void> remove(WidgetTarget target) async {
-    final box = await _openBox();
-    await box.delete(target.storageKey);
-  }
 }
