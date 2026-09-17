@@ -1,18 +1,26 @@
 import 'package:equatable/equatable.dart';
+
 import '../../domain/entities/widget_config.dart';
+import '../../domain/entities/widget_kind.dart';
 
 class WidgetConfigState extends Equatable {
-  final WidgetConfig config;
+  final Map<WidgetKind, WidgetConfig> configs;
 
-  const WidgetConfigState({required this.config});
+  const WidgetConfigState({required this.configs});
 
-  factory WidgetConfigState.initial() =>
-      WidgetConfigState(config: WidgetConfig.initial());
+  factory WidgetConfigState.initial() => WidgetConfigState(
+        configs: {
+          for (final kind in WidgetKind.values) kind: WidgetConfig.initial(),
+        },
+      );
 
-  WidgetConfigState copyWith({WidgetConfig? config}) {
-    return WidgetConfigState(config: config ?? this.config);
+  WidgetConfig configFor(WidgetKind kind) =>
+      configs[kind] ?? WidgetConfig.initial();
+
+  WidgetConfigState withConfig(WidgetKind kind, WidgetConfig config) {
+    return WidgetConfigState(configs: {...configs, kind: config});
   }
 
   @override
-  List<Object?> get props => [config];
+  List<Object?> get props => [configs];
 }

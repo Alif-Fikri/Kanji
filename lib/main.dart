@@ -5,11 +5,9 @@ import 'package:home_widget/home_widget.dart';
 import 'core/theme/app_theme.dart';
 import 'features/widget_config/data/kanji_widget_background_callback.dart';
 import 'features/widget_config/data/kanji_widget_hive_bootstrap.dart';
-import 'features/widget_config/data/kanji_widget_updater.dart';
 import 'features/widget_config/presentation/bloc/widget_config_bloc.dart';
 import 'features/widget_config/presentation/bloc/widget_config_event.dart';
-import 'features/widget_config/presentation/bloc/widget_config_state.dart';
-import 'features/widget_config/presentation/pages/widget_preview_page.dart';
+import 'features/widget_gallery/presentation/pages/widget_gallery_page.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -26,14 +24,11 @@ class KanjiWidgetApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return BlocProvider(
       create: (_) => WidgetConfigBloc()..add(const WidgetConfigLoaded()),
-      child: BlocListener<WidgetConfigBloc, WidgetConfigState>(
-        listener: (context, state) => updateKanjiClockWidget(state.config),
-        child: MaterialApp(
-          title: 'Kanji Widget',
-          debugShowCheckedModeBanner: false,
-          theme: buildKanjiTheme(),
-          home: const WidgetPreviewPage(),
-        ),
+      child: MaterialApp(
+        title: 'Kanji Widget',
+        debugShowCheckedModeBanner: false,
+        theme: buildKanjiTheme(),
+        home: const WidgetGalleryPage(),
       ),
     );
   }

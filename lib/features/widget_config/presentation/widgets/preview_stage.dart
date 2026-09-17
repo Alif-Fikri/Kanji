@@ -1,13 +1,20 @@
 import 'package:flutter/material.dart';
 
 import '../../domain/entities/widget_config.dart';
-import 'kanji_clock_face.dart';
+import '../../domain/entities/widget_kind.dart';
+import 'widget_face.dart';
 
 class PreviewStage extends StatelessWidget {
+  final WidgetKind kind;
   final WidgetConfig config;
   final DateTime now;
 
-  const PreviewStage({super.key, required this.config, required this.now});
+  const PreviewStage({
+    super.key,
+    required this.kind,
+    required this.config,
+    required this.now,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -42,7 +49,7 @@ class PreviewStage extends StatelessWidget {
             ),
             Center(
               child: FittedBox(
-                child: KanjiClockFace(config: config, now: now),
+                child: buildWidgetFace(kind: kind, config: config, now: now),
               ),
             ),
             Positioned(

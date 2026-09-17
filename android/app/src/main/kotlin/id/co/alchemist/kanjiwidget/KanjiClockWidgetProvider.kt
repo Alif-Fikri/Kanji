@@ -22,7 +22,7 @@ class KanjiClockWidgetProvider : HomeWidgetProvider() {
                     HomeWidgetLaunchIntent.getActivity(context, MainActivity::class.java)
                 setOnClickPendingIntent(R.id.kanji_clock_widget_root, pendingIntent)
 
-                val imagePath = widgetData.getString("kanji_clock_image", null)
+                val imagePath = widgetData.getString("clock_image", null)
                 if (imagePath != null) {
                     setImageViewBitmap(
                         R.id.kanji_clock_widget_image,

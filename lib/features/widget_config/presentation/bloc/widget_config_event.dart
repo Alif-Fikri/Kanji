@@ -1,5 +1,7 @@
 import 'package:equatable/equatable.dart';
+
 import '../../domain/entities/widget_config.dart';
+import '../../domain/entities/widget_kind.dart';
 
 sealed class WidgetConfigEvent extends Equatable {
   const WidgetConfigEvent();
@@ -13,41 +15,46 @@ class WidgetConfigLoaded extends WidgetConfigEvent {
 }
 
 class FontChanged extends WidgetConfigEvent {
+  final WidgetKind kind;
   final KanjiFont font;
-  const FontChanged(this.font);
+  const FontChanged(this.kind, this.font);
 
   @override
-  List<Object?> get props => [font];
+  List<Object?> get props => [kind, font];
 }
 
 class SizeChanged extends WidgetConfigEvent {
+  final WidgetKind kind;
   final WidgetSize size;
-  const SizeChanged(this.size);
+  const SizeChanged(this.kind, this.size);
 
   @override
-  List<Object?> get props => [size];
+  List<Object?> get props => [kind, size];
 }
 
 class TextColorChanged extends WidgetConfigEvent {
+  final WidgetKind kind;
   final int color;
-  const TextColorChanged(this.color);
+  const TextColorChanged(this.kind, this.color);
 
   @override
-  List<Object?> get props => [color];
+  List<Object?> get props => [kind, color];
 }
 
 class BackgroundColorChanged extends WidgetConfigEvent {
+  final WidgetKind kind;
   final int color;
-  const BackgroundColorChanged(this.color);
+  const BackgroundColorChanged(this.kind, this.color);
 
   @override
-  List<Object?> get props => [color];
+  List<Object?> get props => [kind, color];
 }
 
 class BackgroundVisibilityToggled extends WidgetConfigEvent {
+  final WidgetKind kind;
   final bool showBackground;
-  const BackgroundVisibilityToggled(this.showBackground);
+  const BackgroundVisibilityToggled(this.kind, this.showBackground);
 
   @override
-  List<Object?> get props => [showBackground];
+  List<Object?> get props => [kind, showBackground];
 }

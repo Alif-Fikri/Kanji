@@ -52,11 +52,16 @@ class SettingsCard extends StatelessWidget {
       width: double.infinity,
       padding: const EdgeInsets.all(18),
       decoration: BoxDecoration(
-        color: Colors.white.withAlpha(150),
-        borderRadius: BorderRadius.circular(20),
-        border: Border.all(
-          color: Theme.of(context).colorScheme.onSurface.withAlpha(20),
-        ),
+        color: Colors.white.withAlpha(214),
+        borderRadius: BorderRadius.circular(22),
+        border: Border.all(color: Colors.white.withAlpha(230)),
+        boxShadow: [
+          BoxShadow(
+            color: const Color(0xFF6B4A32).withAlpha(20),
+            blurRadius: 24,
+            offset: const Offset(0, 8),
+          ),
+        ],
       ),
       child: child,
     );

@@ -1,20 +1,28 @@
 import 'package:hive/hive.dart';
 
 import '../domain/entities/widget_config.dart';
+import '../domain/entities/widget_kind.dart';
 
 class WidgetConfigLocalDataSource {
   static const String boxName = 'widget_config_box';
-  static const String configKey = 'config';
 
   Future<Box<WidgetConfig>> _openBox() => Hive.openBox<WidgetConfig>(boxName);
 
-  Future<WidgetConfig> load() async {
+  Future<WidgetConfig> load(WidgetKind kind) async {
     final box = await _openBox();
-    return box.get(configKey) ?? WidgetConfig.initial();
+    return box.get(kind.name) ?? WidgetConfig.initial();
   }
 
-  Future<void> save(WidgetConfig config) async {
+  Future<Map<WidgetKind, WidgetConfig>> loadAll() async {
     final box = await _openBox();
-    await box.put(configKey, config);
+    return {
+      for (final kind in WidgetKind.values)
+        kind: box.get(kind.name) ?? WidgetConfig.initial(),
+    };
+  }
+
+  Future<void> save(WidgetKind kind, WidgetConfig config) async {
+    final box = await _openBox();
+    await box.put(kind.name, config);
   }
 }

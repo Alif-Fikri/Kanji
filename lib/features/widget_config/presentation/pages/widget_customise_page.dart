@@ -6,7 +6,8 @@ import 'package:home_widget/home_widget.dart';
 
 import '../../../../core/theme/kanji_palette.dart';
 import '../../../../core/widgets/section_header.dart';
-import '../../data/kanji_widget_updater.dart';
+import '../../../../core/widgets/washi_background.dart';
+import '../../domain/entities/widget_kind.dart';
 import '../bloc/widget_config_bloc.dart';
 import '../bloc/widget_config_event.dart';
 import '../bloc/widget_config_state.dart';
@@ -14,14 +15,16 @@ import '../widgets/color_swatch_row.dart';
 import '../widgets/font_selector.dart';
 import '../widgets/preview_stage.dart';
 
-class WidgetPreviewPage extends StatefulWidget {
-  const WidgetPreviewPage({super.key});
+class WidgetCustomisePage extends StatefulWidget {
+  final WidgetKind kind;
+
+  const WidgetCustomisePage({super.key, required this.kind});
 
   @override
-  State<WidgetPreviewPage> createState() => _WidgetPreviewPageState();
+  State<WidgetCustomisePage> createState() => _WidgetCustomisePageState();
 }
 
-class _WidgetPreviewPageState extends State<WidgetPreviewPage> {
+class _WidgetCustomisePageState extends State<WidgetCustomisePage> {
   late Timer _ticker;
   DateTime _now = DateTime.now();
 
@@ -40,6 +43,9 @@ class _WidgetPreviewPageState extends State<WidgetPreviewPage> {
   }
 
   Future<void> _pinWidget() async {
+    final provider = widget.kind.androidProvider;
+    if (provider == null) return;
+
     final supported = await HomeWidget.isRequestPinWidgetSupported() ?? false;
     if (!mounted) return;
 
@@ -47,9 +53,7 @@ class _WidgetPreviewPageState extends State<WidgetPreviewPage> {
       _showAddInstructions();
       return;
     }
-    await HomeWidget.requestPinWidget(
-      qualifiedAndroidName: kanjiClockAndroidProvider,
-    );
+    await HomeWidget.requestPinWidget(qualifiedAndroidName: provider);
   }
 
   void _showAddInstructions() {
@@ -82,36 +86,26 @@ class _WidgetPreviewPageState extends State<WidgetPreviewPage> {
   @override
   Widget build(BuildContext context) {
     final scheme = Theme.of(context).colorScheme;
+    final kind = widget.kind;
 
     return Scaffold(
-      body: SafeArea(
+      extendBodyBehindAppBar: true,
+      appBar: AppBar(title: Text(kind.title)),
+      body: WashiBackground(
         child: BlocBuilder<WidgetConfigBloc, WidgetConfigState>(
           builder: (context, state) {
-            final config = state.config;
+            final config = state.configFor(kind);
             final bloc = context.read<WidgetConfigBloc>();
 
             return ListView(
-              padding: const EdgeInsets.fromLTRB(20, 12, 20, 36),
+              padding: EdgeInsets.fromLTRB(
+                20,
+                MediaQuery.of(context).padding.top + kToolbarHeight + 8,
+                20,
+                36,
+              ),
               children: [
-                Text(
-                  'Kanji Clock',
-                  style: TextStyle(
-                    fontSize: 30,
-                    fontWeight: FontWeight.w700,
-                    color: scheme.onSurface,
-                    height: 1.1,
-                  ),
-                ),
-                Text(
-                  'Customise your home screen widget',
-                  style: TextStyle(
-                    fontSize: 13,
-                    letterSpacing: 0.6,
-                    color: scheme.onSurface.withAlpha(130),
-                  ),
-                ),
-                const SizedBox(height: 20),
-                PreviewStage(config: config, now: _now),
+                PreviewStage(kind: kind, config: config, now: _now),
                 const SizedBox(height: 26),
                 SettingsCard(
                   child: Column(
@@ -120,13 +114,13 @@ class _WidgetPreviewPageState extends State<WidgetPreviewPage> {
                       const SectionHeader(label: 'Font'),
                       FontSelector(
                         selected: config.font,
-                        onSelected: (font) => bloc.add(FontChanged(font)),
+                        onSelected: (font) => bloc.add(FontChanged(kind, font)),
                       ),
                       const SizedBox(height: 26),
                       const SectionHeader(label: 'Size'),
                       SizeSelector(
                         selected: config.size,
-                        onSelected: (size) => bloc.add(SizeChanged(size)),
+                        onSelected: (size) => bloc.add(SizeChanged(kind, size)),
                       ),
                     ],
                   ),
@@ -141,7 +135,7 @@ class _WidgetPreviewPageState extends State<WidgetPreviewPage> {
                         options: KanjiPalette.texts,
                         selected: config.textColor,
                         onSelected: (color) =>
-                            bloc.add(TextColorChanged(color)),
+                            bloc.add(TextColorChanged(kind, color)),
                       ),
                     ],
                   ),
@@ -178,8 +172,9 @@ class _WidgetPreviewPageState extends State<WidgetPreviewPage> {
                           ),
                           Switch(
                             value: config.showBackground,
-                            onChanged: (value) =>
-                                bloc.add(BackgroundVisibilityToggled(value)),
+                            onChanged: (value) => bloc.add(
+                              BackgroundVisibilityToggled(kind, value),
+                            ),
                           ),
                         ],
                       ),
@@ -194,7 +189,7 @@ class _WidgetPreviewPageState extends State<WidgetPreviewPage> {
                             options: KanjiPalette.backgrounds,
                             selected: config.backgroundColor,
                             onSelected: (color) =>
-                                bloc.add(BackgroundColorChanged(color)),
+                                bloc.add(BackgroundColorChanged(kind, color)),
                           ),
                         ),
                         secondChild: const SizedBox(width: double.infinity),
