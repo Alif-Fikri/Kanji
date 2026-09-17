@@ -24,7 +24,7 @@ class WidgetGalleryTile extends StatelessWidget {
     final available = kind.isAvailable;
 
     return Opacity(
-      opacity: available ? 1 : 0.55,
+      opacity: available ? 1 : 0.7,
       child: GestureDetector(
         behavior: HitTestBehavior.opaque,
         onTap: onTap,
@@ -99,7 +99,7 @@ class WidgetGalleryTile extends StatelessWidget {
               style: TextStyle(
                 fontSize: 13,
                 height: 1.35,
-                color: scheme.onSurface.withAlpha(130),
+                color: scheme.onSurface.withAlpha(165),
               ),
             ),
           ],
