@@ -22,4 +22,10 @@ extension WidgetKindInfo on WidgetKind {
           'id.co.alchemist.kanjiwidget.KanjiClockWidgetProvider',
         _ => null,
       };
+
+  bool matchesAndroidClass(String? className) {
+    final provider = androidProvider;
+    if (provider == null || className == null) return false;
+    return provider.split('.').last == className.split('.').last;
+  }
 }

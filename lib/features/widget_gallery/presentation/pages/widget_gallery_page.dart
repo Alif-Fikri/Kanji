@@ -2,14 +2,11 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:home_widget/home_widget.dart';
 
-import '../../../../core/widgets/section_header.dart';
 import '../../../../core/widgets/washi_background.dart';
 import '../../../widget_config/domain/entities/widget_kind.dart';
 import '../../../widget_config/domain/entities/widget_target.dart';
 import '../../../widget_config/presentation/bloc/widget_config_bloc.dart';
-import '../../../widget_config/presentation/bloc/widget_config_event.dart';
 import '../../../widget_config/presentation/bloc/widget_config_state.dart';
 import '../../../widget_config/presentation/pages/widget_customise_page.dart';
 import '../widgets/widget_gallery_tile.dart';
@@ -21,36 +18,13 @@ class WidgetGalleryPage extends StatefulWidget {
   State<WidgetGalleryPage> createState() => _WidgetGalleryPageState();
 }
 
-class _Hint extends StatelessWidget {
-  final String text;
-
-  const _Hint({required this.text});
-
-  @override
-  Widget build(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.only(bottom: 16),
-      child: Text(
-        text,
-        style: TextStyle(
-          fontSize: 12.5,
-          height: 1.4,
-          color: Theme.of(context).colorScheme.onSurface.withAlpha(140),
-        ),
-      ),
-    );
-  }
-}
-
 class _WidgetGalleryPageState extends State<WidgetGalleryPage> {
   late Timer _ticker;
   DateTime _now = DateTime.now();
-  List<HomeWidgetInfo> _installed = const [];
 
   @override
   void initState() {
     super.initState();
-    _loadInstalled();
     _ticker = Timer.periodic(const Duration(seconds: 10), (_) {
       setState(() => _now = DateTime.now());
     });
@@ -62,34 +36,12 @@ class _WidgetGalleryPageState extends State<WidgetGalleryPage> {
     super.dispose();
   }
 
-  Future<void> _loadInstalled() async {
-    final installed = await HomeWidget.getInstalledWidgets();
-    if (!mounted) return;
-    setState(() {
-      _installed = installed.where((w) => w.androidWidgetId != null).toList();
-    });
-
-    final bloc = context.read<WidgetConfigBloc>();
-    for (final info in _installed) {
-      bloc.add(WidgetTargetOpened(_targetOf(info)));
-    }
-  }
-
-  WidgetTarget _targetOf(HomeWidgetInfo info) {
-    final kind = WidgetKind.values.firstWhere(
-      (candidate) => candidate.androidProvider == info.androidClassName,
-      orElse: () => WidgetKind.clock,
-    );
-    return WidgetTarget(kind, widgetId: info.androidWidgetId);
-  }
-
-  Future<void> _openCustomise(WidgetTarget target) async {
-    await Navigator.of(context).push(
+  void _openCustomise(WidgetKind kind) {
+    Navigator.of(context).push(
       MaterialPageRoute<void>(
-        builder: (_) => WidgetCustomisePage(target: target),
+        builder: (_) => WidgetCustomisePage(target: WidgetTarget(kind)),
       ),
     );
-    await _loadInstalled();
   }
 
   @override
@@ -102,99 +54,63 @@ class _WidgetGalleryPageState extends State<WidgetGalleryPage> {
         body: SafeArea(
           child: BlocBuilder<WidgetConfigBloc, WidgetConfigState>(
             builder: (context, state) {
-              return RefreshIndicator(
-                onRefresh: _loadInstalled,
-                child: ListView(
-                  padding: const EdgeInsets.fromLTRB(20, 16, 20, 36),
-                  children: [
-                    Row(
-                      children: [
-                        Container(
-                          width: 46,
-                          height: 46,
-                          alignment: Alignment.center,
-                          decoration: BoxDecoration(
-                            color: scheme.primary,
-                            borderRadius: BorderRadius.circular(14),
+              return ListView(
+                padding: const EdgeInsets.fromLTRB(20, 16, 20, 36),
+                children: [
+                  Row(
+                    children: [
+                      Container(
+                        width: 46,
+                        height: 46,
+                        alignment: Alignment.center,
+                        decoration: BoxDecoration(
+                          color: scheme.primary,
+                          borderRadius: BorderRadius.circular(14),
+                        ),
+                        child: const Text(
+                          '字',
+                          style: TextStyle(
+                            fontFamily: 'ZenOldMincho',
+                            fontSize: 24,
+                            color: Colors.white,
                           ),
-                          child: const Text(
-                            '字',
-                            style: TextStyle(
-                              fontFamily: 'ZenOldMincho',
-                              fontSize: 24,
-                              color: Colors.white,
+                        ),
+                      ),
+                      const SizedBox(width: 14),
+                      Expanded(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              'Kanji Widget',
+                              style: Theme.of(context).textTheme.headlineMedium
+                                  ?.copyWith(fontSize: 27, height: 1.15),
                             ),
-                          ),
-                        ),
-                        const SizedBox(width: 14),
-                        Expanded(
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Text(
-                                'Kanji Widget',
-                                style: Theme.of(context).textTheme.headlineMedium
-                                    ?.copyWith(fontSize: 27, height: 1.15),
+                            Text(
+                              'Choose a widget for your home screen',
+                              style: TextStyle(
+                                fontSize: 12.5,
+                                color: scheme.onSurface.withAlpha(140),
                               ),
-                              Text(
-                                'Choose a widget for your home screen',
-                                style: TextStyle(
-                                  fontSize: 12.5,
-                                  color: scheme.onSurface.withAlpha(140),
-                                ),
-                              ),
-                            ],
-                          ),
+                            ),
+                          ],
                         ),
-                      ],
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 28),
+                  for (final kind in WidgetKind.values) ...[
+                    WidgetGalleryTile(
+                      kind: kind,
+                      config: state.configFor(WidgetTarget(kind)),
+                      now: _now,
+                      onTap: kind.isAvailable
+                          ? () => _openCustomise(kind)
+                          : null,
                     ),
-                    const SizedBox(height: 28),
-                    if (_installed.isNotEmpty) ...[
-                      const SectionHeader(label: 'On your home screen'),
-                      _Hint(
-                        text:
-                            '${_installed.length} widget'
-                            '${_installed.length > 1 ? 's' : ''} placed. '
-                            'Tap one to restyle just that widget.',
-                      ),
-                      for (final (index, info) in _installed.indexed) ...[
-                        Builder(
-                          builder: (context) {
-                            final target = _targetOf(info);
-                            final config = state.configFor(target);
-                            return WidgetGalleryTile(
-                              kind: target.kind,
-                              config: config,
-                              now: _now,
-                              title: '${target.kind.title} ${index + 1}',
-                              subtitle: config.summary,
-                              onTap: () => _openCustomise(target),
-                            );
-                          },
-                        ),
-                        const SizedBox(height: 26),
-                      ],
-                      const SizedBox(height: 4),
-                      const SectionHeader(label: 'Add a widget'),
-                      const _Hint(
-                        text:
-                            'Set a starting style, then place a new widget on '
-                            'your home screen.',
-                      ),
-                    ],
-                    for (final kind in WidgetKind.values) ...[
-                      WidgetGalleryTile(
-                        kind: kind,
-                        config: state.configFor(WidgetTarget(kind)),
-                        now: _now,
-                        onTap: kind.isAvailable
-                            ? () => _openCustomise(WidgetTarget(kind))
-                            : null,
-                      ),
-                      const SizedBox(height: 30),
-                    ],
+                    const SizedBox(height: 30),
                   ],
-                ),
+                ],
               );
             },
           ),

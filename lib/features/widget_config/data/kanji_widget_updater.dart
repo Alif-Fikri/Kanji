@@ -30,7 +30,7 @@ Future<void> refreshInstalledWidgets(
     if (widgetId == null) continue;
 
     final kind = WidgetKind.values.firstWhere(
-      (candidate) => candidate.androidProvider == info.androidClassName,
+      (candidate) => candidate.matchesAndroidClass(info.androidClassName),
       orElse: () => WidgetKind.clock,
     );
     final target = WidgetTarget(kind, widgetId: widgetId);

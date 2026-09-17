@@ -17,6 +17,7 @@ import '../widgets/color_swatch_row.dart';
 import '../widgets/font_selector.dart';
 import '../widgets/kanji_clock_face.dart';
 import '../widgets/option_controls.dart';
+import '../widgets/placed_widget_row.dart';
 import '../widgets/preview_stage.dart';
 
 class WidgetCustomisePage extends StatefulWidget {
@@ -36,14 +37,49 @@ class WidgetCustomisePage extends StatefulWidget {
 class _WidgetCustomisePageState extends State<WidgetCustomisePage> {
   late Timer _ticker;
   DateTime _now = DateTime.now();
+  List<WidgetTarget> _placed = const [];
 
   @override
   void initState() {
     super.initState();
     context.read<WidgetConfigBloc>().add(WidgetTargetOpened(widget.target));
+    if (widget.target.isTemplate) _loadPlaced();
     _ticker = Timer.periodic(const Duration(seconds: 1), (_) {
       setState(() => _now = DateTime.now());
     });
+  }
+
+  Future<void> _loadPlaced() async {
+    final installed = await HomeWidget.getInstalledWidgets();
+    if (!mounted) return;
+
+    final targets = installed
+        .where(
+          (info) =>
+              info.androidWidgetId != null &&
+              widget.target.kind.matchesAndroidClass(info.androidClassName),
+        )
+        .map(
+          (info) =>
+              WidgetTarget(widget.target.kind, widgetId: info.androidWidgetId),
+        )
+        .toList();
+
+    setState(() => _placed = targets);
+
+    final bloc = context.read<WidgetConfigBloc>();
+    for (final target in targets) {
+      bloc.add(WidgetTargetOpened(target));
+    }
+  }
+
+  Future<void> _editPlaced(WidgetTarget target) async {
+    await Navigator.of(context).push(
+      MaterialPageRoute<void>(
+        builder: (_) => WidgetCustomisePage(target: target),
+      ),
+    );
+    await _loadPlaced();
   }
 
   @override
@@ -139,6 +175,38 @@ class _WidgetCustomisePageState extends State<WidgetCustomisePage> {
                   ),
                 PreviewStage(kind: target.kind, config: config, now: _now),
                 const SizedBox(height: 26),
+                if (_placed.isNotEmpty) ...[
+                  SettingsCard(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        SectionHeader(
+                          label: 'Your widgets',
+                          trailing: '${_placed.length} placed',
+                        ),
+                        Text(
+                          'Already on your home screen. Tap one to restyle '
+                          'just that widget.',
+                          style: TextStyle(
+                            fontSize: 12.5,
+                            height: 1.4,
+                            color: scheme.onSurface.withAlpha(140),
+                          ),
+                        ),
+                        const SizedBox(height: 6),
+                        for (final (index, placed) in _placed.indexed)
+                          PlacedWidgetRow(
+                            kind: placed.kind,
+                            config: state.configFor(placed),
+                            now: _now,
+                            label: '${placed.kind.title} ${index + 1}',
+                            onTap: () => _editPlaced(placed),
+                          ),
+                      ],
+                    ),
+                  ),
+                  const SizedBox(height: 16),
+                ],
                 SettingsCard(
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
