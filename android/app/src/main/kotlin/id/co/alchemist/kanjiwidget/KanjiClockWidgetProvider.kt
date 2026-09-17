@@ -37,7 +37,7 @@ class KanjiClockWidgetProvider : HomeWidgetProvider() {
                     )
                 }
             }
-            appWidgetManager.updateAppWidget(widgetId, views)
+            WidgetUpdateHelper.apply(context, appWidgetManager, widgetId, views)
         }
     }
 
@@ -52,6 +52,11 @@ class KanjiClockWidgetProvider : HomeWidgetProvider() {
             context,
             Uri.parse("kanjiwidget://resized?widgetId=$appWidgetId"),
         ).send()
+    }
+
+    override fun onDeleted(context: Context, appWidgetIds: IntArray) {
+        super.onDeleted(context, appWidgetIds)
+        appWidgetIds.forEach { WidgetUpdateHelper.clear(context, it) }
     }
 
     override fun onEnabled(context: Context) {
