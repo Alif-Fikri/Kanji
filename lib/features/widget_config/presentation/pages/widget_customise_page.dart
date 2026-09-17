@@ -1,10 +1,12 @@
 import 'dart:async';
+import 'dart:math';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:home_widget/home_widget.dart';
 
 import '../../../../core/theme/kanji_palette.dart';
+import '../../../../core/utils/date_index_selector.dart';
 import '../../../../core/widgets/section_header.dart';
 import '../../../../core/widgets/washi_background.dart';
 import '../../../daily_kanji/data/daily_kanji_cache.dart';
@@ -103,6 +105,36 @@ class _WidgetCustomisePageState extends State<WidgetCustomisePage> {
   void _update(WidgetConfig config) {
     context.read<WidgetConfigBloc>().add(
       WidgetConfigChanged(widget.target, config),
+    );
+  }
+
+  int? _contentLength() => switch (widget.target.kind) {
+    WidgetKind.dailyKanji => DailyKanjiCache.entries?.length,
+    WidgetKind.quote => QuoteCache.entries?.length,
+    WidgetKind.clock => null,
+  };
+
+  void _shuffleContent(WidgetConfig config) {
+    final length = _contentLength();
+    if (length == null || length < 2) return;
+
+    final today = dateKey(_now);
+    final currentIndex = activeOverrideIndex(
+      config.contentOverrideDate,
+      config.contentOverrideIndex,
+      _now,
+    );
+
+    var nextIndex = currentIndex ?? dailyIndexFor(_now, length);
+    while (nextIndex == (currentIndex ?? dailyIndexFor(_now, length))) {
+      nextIndex = Random().nextInt(length);
+    }
+
+    _update(
+      config.copyWith(
+        contentOverrideDate: today,
+        contentOverrideIndex: nextIndex,
+      ),
     );
   }
 
@@ -212,6 +244,37 @@ class _WidgetCustomisePageState extends State<WidgetCustomisePage> {
                             label: '${placed.kind.title} ${index + 1}',
                             onTap: () => _editPlaced(placed),
                           ),
+                      ],
+                    ),
+                  ),
+                  const SizedBox(height: 16),
+                ],
+                if (target.kind != WidgetKind.clock) ...[
+                  SettingsCard(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        SectionHeader(
+                          label: target.kind == WidgetKind.dailyKanji
+                              ? "Today's kanji"
+                              : "Today's quote",
+                        ),
+                        Text(
+                          'Changes daily on its own. Not feeling this one? '
+                          "Shuffle for another — it'll still change "
+                          'automatically again tomorrow.',
+                          style: TextStyle(
+                            fontSize: 12.5,
+                            height: 1.4,
+                            color: scheme.onSurface.withAlpha(140),
+                          ),
+                        ),
+                        const SizedBox(height: 14),
+                        OutlinedButton.icon(
+                          onPressed: () => _shuffleContent(config),
+                          icon: const Icon(Icons.shuffle, size: 18),
+                          label: const Text('Shuffle'),
+                        ),
                       ],
                     ),
                   ),

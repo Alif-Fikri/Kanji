@@ -19,6 +19,8 @@ class WidgetConfig extends Equatable {
   final NumeralStyle numeralStyle;
   final bool boldText;
   final bool showTranslation;
+  final String? contentOverrideDate;
+  final int? contentOverrideIndex;
 
   const WidgetConfig({
     required this.font,
@@ -33,6 +35,8 @@ class WidgetConfig extends Equatable {
     required this.numeralStyle,
     required this.boldText,
     required this.showTranslation,
+    this.contentOverrideDate,
+    this.contentOverrideIndex,
   });
 
   factory WidgetConfig.initial() => const WidgetConfig(
@@ -63,6 +67,8 @@ class WidgetConfig extends Equatable {
     NumeralStyle? numeralStyle,
     bool? boldText,
     bool? showTranslation,
+    String? contentOverrideDate,
+    int? contentOverrideIndex,
   }) {
     return WidgetConfig(
       font: font ?? this.font,
@@ -77,6 +83,8 @@ class WidgetConfig extends Equatable {
       numeralStyle: numeralStyle ?? this.numeralStyle,
       boldText: boldText ?? this.boldText,
       showTranslation: showTranslation ?? this.showTranslation,
+      contentOverrideDate: contentOverrideDate ?? this.contentOverrideDate,
+      contentOverrideIndex: contentOverrideIndex ?? this.contentOverrideIndex,
     );
   }
 
@@ -105,5 +113,7 @@ class WidgetConfig extends Equatable {
     numeralStyle,
     boldText,
     showTranslation,
+    contentOverrideDate,
+    contentOverrideIndex,
   ];
 }

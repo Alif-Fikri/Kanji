@@ -14,9 +14,12 @@ class DailyKanjiCache {
     _entries = await _pending;
   }
 
-  static DailyKanjiEntry? entryFor(DateTime date) {
+  static DailyKanjiEntry? entryFor(DateTime date, {int? overrideIndex}) {
     final loaded = _entries;
     if (loaded == null || loaded.isEmpty) return null;
+    if (overrideIndex != null && overrideIndex >= 0 && overrideIndex < loaded.length) {
+      return loaded[overrideIndex];
+    }
     return selectKanjiForDate(loaded, date);
   }
 }

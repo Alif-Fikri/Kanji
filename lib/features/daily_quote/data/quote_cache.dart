@@ -14,9 +14,12 @@ class QuoteCache {
     _entries = await _pending;
   }
 
-  static QuoteEntry? entryFor(DateTime date) {
+  static QuoteEntry? entryFor(DateTime date, {int? overrideIndex}) {
     final loaded = _entries;
     if (loaded == null || loaded.isEmpty) return null;
+    if (overrideIndex != null && overrideIndex >= 0 && overrideIndex < loaded.length) {
+      return loaded[overrideIndex];
+    }
     return selectQuoteForDate(loaded, date);
   }
 }

@@ -66,13 +66,15 @@ class WidgetConfigAdapter extends TypeAdapter<WidgetConfig> {
       numeralStyle: fields[9] as NumeralStyle? ?? fallback.numeralStyle,
       boldText: fields[10] as bool? ?? fallback.boldText,
       showTranslation: fields[11] as bool? ?? fallback.showTranslation,
+      contentOverrideDate: fields[12] as String?,
+      contentOverrideIndex: fields[13] as int?,
     );
   }
 
   @override
   void write(BinaryWriter writer, WidgetConfig obj) {
     writer
-      ..writeByte(12)
+      ..writeByte(14)
       ..writeByte(0)
       ..write(obj.font)
       ..writeByte(1)
@@ -96,6 +98,10 @@ class WidgetConfigAdapter extends TypeAdapter<WidgetConfig> {
       ..writeByte(10)
       ..write(obj.boldText)
       ..writeByte(11)
-      ..write(obj.showTranslation);
+      ..write(obj.showTranslation)
+      ..writeByte(12)
+      ..write(obj.contentOverrideDate)
+      ..writeByte(13)
+      ..write(obj.contentOverrideIndex);
   }
 }

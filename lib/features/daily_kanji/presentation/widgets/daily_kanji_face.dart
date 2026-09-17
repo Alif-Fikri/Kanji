@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+import '../../../../core/utils/date_index_selector.dart';
 import '../../../widget_config/domain/entities/widget_config.dart';
 import '../../../widget_config/presentation/widgets/kanji_clock_face.dart';
 import '../../data/daily_kanji_cache.dart';
@@ -12,7 +13,14 @@ class DailyKanjiFace extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final entry = DailyKanjiCache.entryFor(now);
+    final entry = DailyKanjiCache.entryFor(
+      now,
+      overrideIndex: activeOverrideIndex(
+        config.contentOverrideDate,
+        config.contentOverrideIndex,
+        now,
+      ),
+    );
     final size = KanjiClockMetrics.logicalSize(config.size);
     final textColor = Color(config.textColor);
     final fontFamily = kanjiFontFamilies[config.font];
