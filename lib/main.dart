@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 import 'package:home_widget/home_widget.dart';
+import 'core/theme/app_theme.dart';
 import 'features/widget_config/data/kanji_widget_background_callback.dart';
 import 'features/widget_config/data/kanji_widget_hive_bootstrap.dart';
 import 'features/widget_config/data/kanji_widget_updater.dart';
@@ -29,7 +30,8 @@ class KanjiWidgetApp extends StatelessWidget {
         listener: (context, state) => updateKanjiClockWidget(state.config),
         child: MaterialApp(
           title: 'Kanji Widget',
-          theme: ThemeData(colorSchemeSeed: const Color(0xFFB33A3A)),
+          debugShowCheckedModeBanner: false,
+          theme: buildKanjiTheme(),
           home: const WidgetPreviewPage(),
         ),
       ),

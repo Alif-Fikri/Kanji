@@ -43,3 +43,11 @@ class BackgroundColorChanged extends WidgetConfigEvent {
   @override
   List<Object?> get props => [color];
 }
+
+class BackgroundVisibilityToggled extends WidgetConfigEvent {
+  final bool showBackground;
+  const BackgroundVisibilityToggled(this.showBackground);
+
+  @override
+  List<Object?> get props => [showBackground];
+}

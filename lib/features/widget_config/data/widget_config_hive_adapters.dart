@@ -45,13 +45,14 @@ class WidgetConfigAdapter extends TypeAdapter<WidgetConfig> {
       size: fields[1] as WidgetSize,
       textColor: fields[2] as int,
       backgroundColor: fields[3] as int,
+      showBackground: fields[4] as bool? ?? true,
     );
   }
 
   @override
   void write(BinaryWriter writer, WidgetConfig obj) {
     writer
-      ..writeByte(4)
+      ..writeByte(5)
       ..writeByte(0)
       ..write(obj.font)
       ..writeByte(1)
@@ -59,6 +60,8 @@ class WidgetConfigAdapter extends TypeAdapter<WidgetConfig> {
       ..writeByte(2)
       ..write(obj.textColor)
       ..writeByte(3)
-      ..write(obj.backgroundColor);
+      ..write(obj.backgroundColor)
+      ..writeByte(4)
+      ..write(obj.showBackground);
   }
 }

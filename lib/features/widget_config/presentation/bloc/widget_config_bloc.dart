@@ -20,6 +20,8 @@ class WidgetConfigBloc extends Bloc<WidgetConfigEvent, WidgetConfigState> {
         _persist(emit, state.config.copyWith(textColor: event.color)));
     on<BackgroundColorChanged>((event, emit) =>
         _persist(emit, state.config.copyWith(backgroundColor: event.color)));
+    on<BackgroundVisibilityToggled>((event, emit) => _persist(
+        emit, state.config.copyWith(showBackground: event.showBackground)));
   }
 
   Future<void> _onLoaded(
