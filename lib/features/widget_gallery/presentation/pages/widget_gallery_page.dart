@@ -96,7 +96,7 @@ class _WidgetGalleryPageState extends State<WidgetGalleryPage> {
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
                             Text(
-                              'Kanji Widget',
+                              'Koyomi',
                               style: Theme.of(context).textTheme.headlineMedium
                                   ?.copyWith(fontSize: 27, height: 1.15),
                             ),

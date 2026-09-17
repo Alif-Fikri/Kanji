@@ -59,7 +59,7 @@ class KanjiWidgetApp extends StatelessWidget {
     return BlocProvider(
       create: (_) => WidgetConfigBloc()..add(const WidgetConfigLoaded()),
       child: MaterialApp(
-        title: 'Kanji Widget',
+        title: 'Koyomi',
         debugShowCheckedModeBanner: false,
         theme: buildKanjiTheme(),
         home: configureTarget != null

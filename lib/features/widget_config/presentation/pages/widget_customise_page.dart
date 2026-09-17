@@ -127,7 +127,7 @@ class _WidgetCustomisePageState extends State<WidgetCustomisePage> {
             for (final step in const [
               '1.  Long-press an empty area on your home screen',
               '2.  Tap "Widgets"',
-              '3.  Find "Kanji Widget", then drag it onto the home screen',
+              '3.  Find "Koyomi", then drag it onto the home screen',
             ])
               Padding(
                 padding: const EdgeInsets.only(bottom: 12),
