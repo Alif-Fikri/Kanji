@@ -1,5 +1,12 @@
 enum WidgetKind { clock, dailyKanji, calendar, countdown }
 
+WidgetKind? widgetKindFromName(String? name) {
+  for (final kind in WidgetKind.values) {
+    if (kind.name == name) return kind;
+  }
+  return null;
+}
+
 extension WidgetKindInfo on WidgetKind {
   String get title => switch (this) {
         WidgetKind.clock => 'Kanji Clock',
@@ -15,11 +22,14 @@ extension WidgetKindInfo on WidgetKind {
         WidgetKind.countdown => 'Days left until a date you choose',
       };
 
-  bool get isAvailable => this == WidgetKind.clock;
+  bool get isAvailable =>
+      this == WidgetKind.clock || this == WidgetKind.dailyKanji;
 
   String? get androidProvider => switch (this) {
         WidgetKind.clock =>
           'id.co.alchemist.kanjiwidget.KanjiClockWidgetProvider',
+        WidgetKind.dailyKanji =>
+          'id.co.alchemist.kanjiwidget.DailyKanjiWidgetProvider',
         _ => null,
       };
 

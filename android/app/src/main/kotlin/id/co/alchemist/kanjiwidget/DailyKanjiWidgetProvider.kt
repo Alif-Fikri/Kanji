@@ -11,7 +11,7 @@ import es.antonborri.home_widget.HomeWidgetBackgroundIntent
 import es.antonborri.home_widget.HomeWidgetLaunchIntent
 import es.antonborri.home_widget.HomeWidgetProvider
 
-class KanjiClockWidgetProvider : HomeWidgetProvider() {
+class DailyKanjiWidgetProvider : HomeWidgetProvider() {
 
     override fun onUpdate(
         context: Context,
@@ -20,19 +20,19 @@ class KanjiClockWidgetProvider : HomeWidgetProvider() {
         widgetData: SharedPreferences,
     ) {
         appWidgetIds.forEach { widgetId ->
-            val views = RemoteViews(context.packageName, R.layout.kanji_clock_widget).apply {
+            val views = RemoteViews(context.packageName, R.layout.daily_kanji_widget).apply {
                 val pendingIntent = HomeWidgetLaunchIntent.getActivity(
                     context,
                     MainActivity::class.java,
-                    Uri.parse("kanjiwidget://edit?widgetId=$widgetId&kind=clock"),
+                    Uri.parse("kanjiwidget://edit?widgetId=$widgetId&kind=dailyKanji"),
                 )
-                setOnClickPendingIntent(R.id.kanji_clock_widget_root, pendingIntent)
+                setOnClickPendingIntent(R.id.daily_kanji_widget_root, pendingIntent)
 
-                val imagePath = widgetData.getString("clock_image_$widgetId", null)
-                    ?: widgetData.getString("clock_image", null)
+                val imagePath = widgetData.getString("dailyKanji_image_$widgetId", null)
+                    ?: widgetData.getString("dailyKanji_image", null)
                 if (imagePath != null) {
                     setImageViewBitmap(
-                        R.id.kanji_clock_widget_image,
+                        R.id.daily_kanji_widget_image,
                         BitmapFactory.decodeFile(imagePath),
                     )
                 }
@@ -56,11 +56,11 @@ class KanjiClockWidgetProvider : HomeWidgetProvider() {
 
     override fun onEnabled(context: Context) {
         super.onEnabled(context)
-        KanjiClockAlarmScheduler.scheduleNextMinute(context)
+        DailyKanjiAlarmScheduler.scheduleNextMidnight(context)
     }
 
     override fun onDisabled(context: Context) {
         super.onDisabled(context)
-        KanjiClockAlarmScheduler.cancel(context)
+        DailyKanjiAlarmScheduler.cancel(context)
     }
 }

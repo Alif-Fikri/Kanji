@@ -64,6 +64,9 @@ flutter:
   # the material Icons class.
   uses-material-design: true
 
+  assets:
+    - assets/data/jlpt_n5_kanji.json
+
   fonts:
     - family: NotoSansJP
       fonts:

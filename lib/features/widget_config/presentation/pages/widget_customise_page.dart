@@ -7,6 +7,7 @@ import 'package:home_widget/home_widget.dart';
 import '../../../../core/theme/kanji_palette.dart';
 import '../../../../core/widgets/section_header.dart';
 import '../../../../core/widgets/washi_background.dart';
+import '../../../daily_kanji/data/daily_kanji_cache.dart';
 import '../../domain/entities/widget_config.dart';
 import '../../domain/entities/widget_kind.dart';
 import '../../domain/entities/widget_target.dart';
@@ -44,6 +45,11 @@ class _WidgetCustomisePageState extends State<WidgetCustomisePage> {
     super.initState();
     context.read<WidgetConfigBloc>().add(WidgetTargetOpened(widget.target));
     if (widget.target.isTemplate) _loadPlaced();
+    if (DailyKanjiCache.entries == null) {
+      DailyKanjiCache.warm().then((_) {
+        if (mounted) setState(() {});
+      });
+    }
     _ticker = Timer.periodic(const Duration(seconds: 1), (_) {
       setState(() => _now = DateTime.now());
     });

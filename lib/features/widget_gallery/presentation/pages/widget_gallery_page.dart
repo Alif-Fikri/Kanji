@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
 import '../../../../core/widgets/washi_background.dart';
+import '../../../daily_kanji/data/daily_kanji_cache.dart';
 import '../../../widget_config/domain/entities/widget_kind.dart';
 import '../../../widget_config/domain/entities/widget_target.dart';
 import '../../../widget_config/presentation/bloc/widget_config_bloc.dart';
@@ -30,6 +31,11 @@ class _WidgetGalleryPageState extends State<WidgetGalleryPage> {
     _ticker = Timer.periodic(const Duration(seconds: 10), (_) {
       setState(() => _now = DateTime.now());
     });
+    if (DailyKanjiCache.entries == null) {
+      DailyKanjiCache.warm().then((_) {
+        if (mounted) setState(() {});
+      });
+    }
 
     final editTarget = widget.editTarget;
     if (editTarget != null) {
