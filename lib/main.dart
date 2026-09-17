@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:hive_flutter/hive_flutter.dart';
@@ -5,6 +7,8 @@ import 'package:home_widget/home_widget.dart';
 import 'core/theme/app_theme.dart';
 import 'features/widget_config/data/kanji_widget_background_callback.dart';
 import 'features/widget_config/data/kanji_widget_hive_bootstrap.dart';
+import 'features/widget_config/data/kanji_widget_updater.dart';
+import 'features/widget_config/data/widget_config_local_data_source.dart';
 import 'features/widget_config/domain/entities/widget_kind.dart';
 import 'features/widget_config/domain/entities/widget_target.dart';
 import 'features/widget_config/presentation/bloc/widget_config_bloc.dart';
@@ -27,6 +31,8 @@ Future<void> main() async {
       editTarget: _targetFromLaunchUri(launchUri),
     ),
   );
+
+  unawaited(refreshInstalledWidgets(WidgetConfigLocalDataSource().load));
 }
 
 WidgetTarget? _targetFromConfigureId(String? configureId) {
@@ -50,20 +56,15 @@ class KanjiWidgetApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final target = configureTarget ?? editTarget;
-
     return BlocProvider(
       create: (_) => WidgetConfigBloc()..add(const WidgetConfigLoaded()),
       child: MaterialApp(
         title: 'Kanji Widget',
         debugShowCheckedModeBanner: false,
         theme: buildKanjiTheme(),
-        home: target == null
-            ? const WidgetGalleryPage()
-            : WidgetCustomisePage(
-                target: target,
-                isConfiguring: configureTarget != null,
-              ),
+        home: configureTarget != null
+            ? WidgetCustomisePage(target: configureTarget!, isConfiguring: true)
+            : WidgetGalleryPage(editTarget: editTarget),
       ),
     );
   }

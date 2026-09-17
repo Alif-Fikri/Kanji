@@ -12,7 +12,9 @@ import '../../../widget_config/presentation/pages/widget_customise_page.dart';
 import '../widgets/widget_gallery_tile.dart';
 
 class WidgetGalleryPage extends StatefulWidget {
-  const WidgetGalleryPage({super.key});
+  final WidgetTarget? editTarget;
+
+  const WidgetGalleryPage({super.key, this.editTarget});
 
   @override
   State<WidgetGalleryPage> createState() => _WidgetGalleryPageState();
@@ -28,6 +30,18 @@ class _WidgetGalleryPageState extends State<WidgetGalleryPage> {
     _ticker = Timer.periodic(const Duration(seconds: 10), (_) {
       setState(() => _now = DateTime.now());
     });
+
+    final editTarget = widget.editTarget;
+    if (editTarget != null) {
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        if (!mounted) return;
+        Navigator.of(context).push(
+          MaterialPageRoute<void>(
+            builder: (_) => WidgetCustomisePage(target: editTarget),
+          ),
+        );
+      });
+    }
   }
 
   @override
