@@ -299,6 +299,17 @@ class _WidgetCustomisePageState extends State<WidgetCustomisePage> {
                         onSelected: (size) =>
                             _update(config.copyWith(size: size)),
                       ),
+                      const SizedBox(height: 8),
+                      Text(
+                        'Sets the starting look. Once the widget is on your '
+                        "home screen, drag its edges to resize it there — "
+                        "the content scales to fit whatever size you set.",
+                        style: TextStyle(
+                          fontSize: 12.5,
+                          height: 1.4,
+                          color: scheme.onSurface.withAlpha(140),
+                        ),
+                      ),
                       const SizedBox(height: 22),
                       OptionSwitch(
                         title: 'Bold text',

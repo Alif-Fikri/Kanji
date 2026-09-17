@@ -21,7 +21,7 @@ class DailyKanjiFace extends StatelessWidget {
         now,
       ),
     );
-    final size = KanjiClockMetrics.logicalSize(config.size);
+    final size = KanjiClockMetrics.effectiveSize(config);
     final textColor = Color(config.textColor);
     final fontFamily = kanjiFontFamilies[config.font];
     final fontWeight = config.boldText ? FontWeight.w700 : FontWeight.w400;
@@ -49,7 +49,7 @@ class DailyKanjiFace extends StatelessWidget {
               ? Color(config.backgroundColor)
               : Colors.transparent,
           child: Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 14),
+            padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
             child: Center(
               child: entry == null
                   ? SizedBox(
@@ -60,23 +60,26 @@ class DailyKanjiFace extends StatelessWidget {
                         color: textColor.withAlpha(140),
                       ),
                     )
-                  : Row(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        Text(
-                          entry.kanji,
-                          style: TextStyle(
-                            fontFamily: fontFamily,
-                            fontSize: KanjiClockMetrics.timeFontSize(config.size),
-                            fontWeight: fontWeight,
-                            height: 1,
-                            color: textColor,
-                            shadows: shadows,
+                  : FittedBox(
+                      child: Row(
+                        mainAxisSize: MainAxisSize.min,
+                        crossAxisAlignment: CrossAxisAlignment.center,
+                        children: [
+                          Text(
+                            entry.kanji,
+                            style: TextStyle(
+                              fontFamily: fontFamily,
+                              fontSize: KanjiClockMetrics.timeFontSize(
+                                config.size,
+                              ),
+                              fontWeight: fontWeight,
+                              height: 1,
+                              color: textColor,
+                              shadows: shadows,
+                            ),
                           ),
-                        ),
-                        SizedBox(width: config.size == WidgetSize.small ? 10 : 16),
-                        Flexible(
-                          child: Column(
+                          const SizedBox(width: 16),
+                          Column(
                             mainAxisSize: MainAxisSize.min,
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
@@ -96,11 +99,10 @@ class DailyKanjiFace extends StatelessWidget {
                               const SizedBox(height: 6),
                               Text(
                                 entry.meaning,
-                                maxLines: 1,
-                                overflow: TextOverflow.ellipsis,
                                 style: TextStyle(
-                                  fontSize:
-                                      KanjiClockMetrics.dateFontSize(config.size),
+                                  fontSize: KanjiClockMetrics.dateFontSize(
+                                    config.size,
+                                  ),
                                   height: 1.1,
                                   color: textColor.withAlpha(210),
                                   shadows: shadows,
@@ -108,8 +110,8 @@ class DailyKanjiFace extends StatelessWidget {
                               ),
                             ],
                           ),
-                        ),
-                      ],
+                        ],
+                      ),
                     ),
             ),
           ),
@@ -136,8 +138,6 @@ class _ReadingLine extends StatelessWidget {
   Widget build(BuildContext context) {
     return Text(
       label,
-      maxLines: 1,
-      overflow: TextOverflow.ellipsis,
       style: TextStyle(
         fontFamily: kanjiFontFamilies[config.font],
         fontSize: KanjiClockMetrics.dateFontSize(config.size) * 0.86,

@@ -48,9 +48,13 @@ class KanjiClockWidgetProvider : HomeWidgetProvider() {
         newOptions: Bundle,
     ) {
         super.onAppWidgetOptionsChanged(context, appWidgetManager, appWidgetId, newOptions)
+        val (widthDp, heightDp) = WidgetSizeHelper.currentSizeDp(newOptions)
         HomeWidgetBackgroundIntent.getBroadcast(
             context,
-            Uri.parse("kanjiwidget://resized?widgetId=$appWidgetId"),
+            Uri.parse(
+                "kanjiwidget://resized?widgetId=$appWidgetId&kind=clock" +
+                    "&widthDp=$widthDp&heightDp=$heightDp",
+            ),
         ).send()
     }
 

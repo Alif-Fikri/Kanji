@@ -48,9 +48,13 @@ class QuoteWidgetProvider : HomeWidgetProvider() {
         newOptions: Bundle,
     ) {
         super.onAppWidgetOptionsChanged(context, appWidgetManager, appWidgetId, newOptions)
+        val (widthDp, heightDp) = WidgetSizeHelper.currentSizeDp(newOptions)
         HomeWidgetBackgroundIntent.getBroadcast(
             context,
-            Uri.parse("kanjiwidget://resized?widgetId=$appWidgetId"),
+            Uri.parse(
+                "kanjiwidget://resized?widgetId=$appWidgetId&kind=quote" +
+                    "&widthDp=$widthDp&heightDp=$heightDp",
+            ),
         ).send()
     }
 

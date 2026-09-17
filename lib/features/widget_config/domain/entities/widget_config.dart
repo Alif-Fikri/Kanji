@@ -21,6 +21,8 @@ class WidgetConfig extends Equatable {
   final bool showTranslation;
   final String? contentOverrideDate;
   final int? contentOverrideIndex;
+  final double? actualWidthDp;
+  final double? actualHeightDp;
 
   const WidgetConfig({
     required this.font,
@@ -37,6 +39,8 @@ class WidgetConfig extends Equatable {
     required this.showTranslation,
     this.contentOverrideDate,
     this.contentOverrideIndex,
+    this.actualWidthDp,
+    this.actualHeightDp,
   });
 
   factory WidgetConfig.initial() => const WidgetConfig(
@@ -69,6 +73,8 @@ class WidgetConfig extends Equatable {
     bool? showTranslation,
     String? contentOverrideDate,
     int? contentOverrideIndex,
+    double? actualWidthDp,
+    double? actualHeightDp,
   }) {
     return WidgetConfig(
       font: font ?? this.font,
@@ -85,6 +91,8 @@ class WidgetConfig extends Equatable {
       showTranslation: showTranslation ?? this.showTranslation,
       contentOverrideDate: contentOverrideDate ?? this.contentOverrideDate,
       contentOverrideIndex: contentOverrideIndex ?? this.contentOverrideIndex,
+      actualWidthDp: actualWidthDp ?? this.actualWidthDp,
+      actualHeightDp: actualHeightDp ?? this.actualHeightDp,
     );
   }
 
@@ -115,5 +123,7 @@ class WidgetConfig extends Equatable {
     showTranslation,
     contentOverrideDate,
     contentOverrideIndex,
+    actualWidthDp,
+    actualHeightDp,
   ];
 }

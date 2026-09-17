@@ -10,7 +10,7 @@ Future<void> updateHomeWidget(WidgetTarget target, WidgetConfig config) async {
   await HomeWidget.renderFlutterWidget(
     buildWidgetFace(kind: target.kind, config: config, now: DateTime.now()),
     key: target.imageKey,
-    logicalSize: KanjiClockMetrics.logicalSize(config.size),
+    logicalSize: KanjiClockMetrics.effectiveSize(config),
     pixelRatio: 3,
   );
 

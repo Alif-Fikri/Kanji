@@ -68,13 +68,15 @@ class WidgetConfigAdapter extends TypeAdapter<WidgetConfig> {
       showTranslation: fields[11] as bool? ?? fallback.showTranslation,
       contentOverrideDate: fields[12] as String?,
       contentOverrideIndex: fields[13] as int?,
+      actualWidthDp: (fields[14] as num?)?.toDouble(),
+      actualHeightDp: (fields[15] as num?)?.toDouble(),
     );
   }
 
   @override
   void write(BinaryWriter writer, WidgetConfig obj) {
     writer
-      ..writeByte(14)
+      ..writeByte(16)
       ..writeByte(0)
       ..write(obj.font)
       ..writeByte(1)
@@ -102,6 +104,10 @@ class WidgetConfigAdapter extends TypeAdapter<WidgetConfig> {
       ..writeByte(12)
       ..write(obj.contentOverrideDate)
       ..writeByte(13)
-      ..write(obj.contentOverrideIndex);
+      ..write(obj.contentOverrideIndex)
+      ..writeByte(14)
+      ..write(obj.actualWidthDp)
+      ..writeByte(15)
+      ..write(obj.actualHeightDp);
   }
 }

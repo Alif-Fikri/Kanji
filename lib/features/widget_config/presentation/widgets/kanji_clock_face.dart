@@ -34,6 +34,13 @@ class KanjiClockMetrics {
     WidgetSize.large => const Size(340, 215),
   };
 
+  static Size effectiveSize(WidgetConfig config) {
+    final w = config.actualWidthDp;
+    final h = config.actualHeightDp;
+    if (w == null || h == null) return logicalSize(config.size);
+    return Size(w, h);
+  }
+
   static double timeFontSize(WidgetSize size) => switch (size) {
     WidgetSize.small => 30,
     WidgetSize.medium => 38,
@@ -55,7 +62,7 @@ class KanjiClockFace extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final size = KanjiClockMetrics.logicalSize(config.size);
+    final size = KanjiClockMetrics.effectiveSize(config);
     final textColor = Color(config.textColor);
 
     final shadows = config.showBackground
@@ -97,11 +104,11 @@ class KanjiClockFace extends StatelessWidget {
           child: Padding(
             padding: const EdgeInsets.symmetric(horizontal: 12),
             child: Center(
-              child: Column(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  FittedBox(
-                    child: Text(
+              child: FittedBox(
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Text(
                       timeText,
                       style: TextStyle(
                         fontFamily: fontFamily,
@@ -112,11 +119,11 @@ class KanjiClockFace extends StatelessWidget {
                         shadows: shadows,
                       ),
                     ),
-                  ),
-                  if (config.showDate) ...[
-                    SizedBox(height: config.size == WidgetSize.small ? 2 : 6),
-                    FittedBox(
-                      child: Text(
+                    if (config.showDate) ...[
+                      SizedBox(
+                        height: config.size == WidgetSize.small ? 2 : 6,
+                      ),
+                      Text(
                         formatKanjiDate(
                           now,
                           style: config.numeralStyle,
@@ -131,9 +138,9 @@ class KanjiClockFace extends StatelessWidget {
                           shadows: shadows,
                         ),
                       ),
-                    ),
+                    ],
                   ],
-                ],
+                ),
               ),
             ),
           ),

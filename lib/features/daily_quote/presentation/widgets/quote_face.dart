@@ -21,7 +21,7 @@ class QuoteFace extends StatelessWidget {
         now,
       ),
     );
-    final size = KanjiClockMetrics.logicalSize(config.size);
+    final size = KanjiClockMetrics.effectiveSize(config);
     final textColor = Color(config.textColor);
     final fontFamily = kanjiFontFamilies[config.font];
     final fontWeight = config.boldText ? FontWeight.w700 : FontWeight.w400;
@@ -60,43 +60,41 @@ class QuoteFace extends StatelessWidget {
                         color: textColor.withAlpha(140),
                       ),
                     )
-                  : Column(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        Text(
-                          entry.japanese,
-                          textAlign: TextAlign.center,
-                          maxLines: 2,
-                          overflow: TextOverflow.ellipsis,
-                          style: TextStyle(
-                            fontFamily: fontFamily,
-                            fontSize:
-                                KanjiClockMetrics.timeFontSize(config.size) *
-                                0.62,
-                            fontWeight: fontWeight,
-                            height: 1.25,
-                            color: textColor,
-                            shadows: shadows,
-                          ),
-                        ),
-                        if (config.showTranslation) ...[
-                          const SizedBox(height: 8),
+                  : FittedBox(
+                      child: Column(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
                           Text(
-                            entry.english,
+                            entry.japanese,
                             textAlign: TextAlign.center,
-                            maxLines: 2,
-                            overflow: TextOverflow.ellipsis,
                             style: TextStyle(
-                              fontSize: KanjiClockMetrics.dateFontSize(
-                                config.size,
-                              ),
-                              height: 1.2,
-                              color: textColor.withAlpha(200),
+                              fontFamily: fontFamily,
+                              fontSize:
+                                  KanjiClockMetrics.timeFontSize(config.size) *
+                                  0.62,
+                              fontWeight: fontWeight,
+                              height: 1.25,
+                              color: textColor,
                               shadows: shadows,
                             ),
                           ),
+                          if (config.showTranslation) ...[
+                            const SizedBox(height: 8),
+                            Text(
+                              entry.english,
+                              textAlign: TextAlign.center,
+                              style: TextStyle(
+                                fontSize: KanjiClockMetrics.dateFontSize(
+                                  config.size,
+                                ),
+                                height: 1.2,
+                                color: textColor.withAlpha(200),
+                                shadows: shadows,
+                              ),
+                            ),
+                          ],
                         ],
-                      ],
+                      ),
                     ),
             ),
           ),
