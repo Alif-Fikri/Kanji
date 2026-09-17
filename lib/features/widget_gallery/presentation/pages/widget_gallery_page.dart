@@ -130,9 +130,7 @@ class _WidgetGalleryPageState extends State<WidgetGalleryPage> {
                       kind: kind,
                       config: state.configFor(WidgetTarget(kind)),
                       now: _now,
-                      onTap: kind.isAvailable
-                          ? () => _openCustomise(kind)
-                          : null,
+                      onTap: () => _openCustomise(kind),
                     ),
                     const SizedBox(height: 30),
                   ],

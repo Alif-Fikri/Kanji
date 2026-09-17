@@ -112,8 +112,6 @@ class _WidgetCustomisePageState extends State<WidgetCustomisePage> {
 
   Future<void> _pinWidget() async {
     final provider = widget.target.kind.androidProvider;
-    if (provider == null) return;
-
     final supported = await HomeWidget.isRequestPinWidgetSupported() ?? false;
     if (!mounted) return;
 

@@ -7,9 +7,6 @@ import '../presentation/widgets/kanji_clock_face.dart';
 import '../presentation/widgets/widget_face.dart';
 
 Future<void> updateHomeWidget(WidgetTarget target, WidgetConfig config) async {
-  final provider = target.kind.androidProvider;
-  if (provider == null) return;
-
   await HomeWidget.renderFlutterWidget(
     buildWidgetFace(kind: target.kind, config: config, now: DateTime.now()),
     key: target.imageKey,
@@ -17,7 +14,7 @@ Future<void> updateHomeWidget(WidgetTarget target, WidgetConfig config) async {
     pixelRatio: 3,
   );
 
-  await HomeWidget.updateWidget(qualifiedAndroidName: provider);
+  await HomeWidget.updateWidget(qualifiedAndroidName: target.kind.androidProvider);
 }
 
 Future<void> refreshInstalledWidgets(
