@@ -2,8 +2,9 @@ import 'package:flutter/material.dart';
 
 class SectionHeader extends StatelessWidget {
   final String label;
+  final String? trailing;
 
-  const SectionHeader({super.key, required this.label});
+  const SectionHeader({super.key, required this.label, this.trailing});
 
   @override
   Widget build(BuildContext context) {
@@ -35,6 +36,17 @@ class SectionHeader extends StatelessWidget {
           Expanded(
             child: Container(height: 1, color: onSurface.withAlpha(28)),
           ),
+          if (trailing != null) ...[
+            const SizedBox(width: 12),
+            Text(
+              trailing!,
+              style: TextStyle(
+                fontSize: 12,
+                fontWeight: FontWeight.w600,
+                color: onSurface.withAlpha(175),
+              ),
+            ),
+          ],
         ],
       ),
     );

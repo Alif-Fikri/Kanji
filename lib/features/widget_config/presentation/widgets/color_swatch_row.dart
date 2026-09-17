@@ -16,43 +16,37 @@ class ColorSwatchRow extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final onSurface = Theme.of(context).colorScheme.onSurface;
+    final scheme = Theme.of(context).colorScheme;
 
     return Wrap(
-      spacing: 14,
-      runSpacing: 14,
+      spacing: 11,
+      runSpacing: 11,
       children: options.map((option) {
         final isSelected = option.value == selected;
+        final tickColor = option.color.computeLuminance() > 0.55
+            ? const Color(KanjiPalette.sumi)
+            : Colors.white;
+
         return GestureDetector(
           onTap: () => onSelected(option.value),
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              AnimatedContainer(
-                duration: const Duration(milliseconds: 160),
-                width: 44,
-                height: 44,
-                decoration: BoxDecoration(
-                  color: option.color,
-                  shape: BoxShape.circle,
-                  border: Border.all(
-                    color: isSelected
-                        ? Theme.of(context).colorScheme.primary
-                        : onSurface.withAlpha(36),
-                    width: isSelected ? 3 : 1,
-                  ),
-                ),
+          child: AnimatedContainer(
+            duration: const Duration(milliseconds: 150),
+            width: 42,
+            height: 42,
+            alignment: Alignment.center,
+            decoration: BoxDecoration(
+              color: option.color,
+              shape: BoxShape.circle,
+              border: Border.all(
+                color: isSelected
+                    ? scheme.primary
+                    : scheme.onSurface.withAlpha(38),
+                width: isSelected ? 3 : 1,
               ),
-              const SizedBox(height: 6),
-              Text(
-                option.name,
-                style: TextStyle(
-                  fontSize: 11,
-                  color: onSurface.withAlpha(isSelected ? 220 : 120),
-                  fontWeight: isSelected ? FontWeight.w700 : FontWeight.w400,
-                ),
-              ),
-            ],
+            ),
+            child: isSelected
+                ? Icon(Icons.check_rounded, size: 19, color: tickColor)
+                : null,
           ),
         );
       }).toList(),

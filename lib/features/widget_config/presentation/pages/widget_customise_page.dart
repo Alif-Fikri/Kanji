@@ -88,22 +88,17 @@ class _WidgetCustomisePageState extends State<WidgetCustomisePage> {
     final scheme = Theme.of(context).colorScheme;
     final kind = widget.kind;
 
-    return Scaffold(
-      extendBodyBehindAppBar: true,
-      appBar: AppBar(title: Text(kind.title)),
-      body: WashiBackground(
-        child: BlocBuilder<WidgetConfigBloc, WidgetConfigState>(
+    return WashiBackground(
+      child: Scaffold(
+        backgroundColor: Colors.transparent,
+        appBar: AppBar(title: Text(kind.title)),
+        body: BlocBuilder<WidgetConfigBloc, WidgetConfigState>(
           builder: (context, state) {
             final config = state.configFor(kind);
             final bloc = context.read<WidgetConfigBloc>();
 
             return ListView(
-              padding: EdgeInsets.fromLTRB(
-                20,
-                MediaQuery.of(context).padding.top + kToolbarHeight + 8,
-                20,
-                36,
-              ),
+              padding: const EdgeInsets.fromLTRB(20, 8, 20, 36),
               children: [
                 PreviewStage(kind: kind, config: config, now: _now),
                 const SizedBox(height: 26),
@@ -130,7 +125,10 @@ class _WidgetCustomisePageState extends State<WidgetCustomisePage> {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      const SectionHeader(label: 'Text colour'),
+                      SectionHeader(
+                        label: 'Text colour',
+                        trailing: KanjiPalette.nameOf(config.textColor),
+                      ),
                       ColorSwatchRow(
                         options: KanjiPalette.texts,
                         selected: config.textColor,
@@ -145,7 +143,12 @@ class _WidgetCustomisePageState extends State<WidgetCustomisePage> {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      const SectionHeader(label: 'Background'),
+                      SectionHeader(
+                        label: 'Background',
+                        trailing: config.showBackground
+                            ? KanjiPalette.nameOf(config.backgroundColor)
+                            : 'Transparent',
+                      ),
                       Row(
                         children: [
                           Expanded(
