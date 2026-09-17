@@ -1,24 +1,22 @@
 import 'package:equatable/equatable.dart';
 
 import '../../domain/entities/widget_config.dart';
-import '../../domain/entities/widget_kind.dart';
+import '../../domain/entities/widget_target.dart';
 
 class WidgetConfigState extends Equatable {
-  final Map<WidgetKind, WidgetConfig> configs;
+  final Map<String, WidgetConfig> configs;
 
   const WidgetConfigState({required this.configs});
 
-  factory WidgetConfigState.initial() => WidgetConfigState(
-        configs: {
-          for (final kind in WidgetKind.values) kind: WidgetConfig.initial(),
-        },
-      );
+  factory WidgetConfigState.initial() => const WidgetConfigState(configs: {});
 
-  WidgetConfig configFor(WidgetKind kind) =>
-      configs[kind] ?? WidgetConfig.initial();
+  WidgetConfig configFor(WidgetTarget target) =>
+      configs[target.storageKey] ?? WidgetConfig.initial();
 
-  WidgetConfigState withConfig(WidgetKind kind, WidgetConfig config) {
-    return WidgetConfigState(configs: {...configs, kind: config});
+  WidgetConfigState withConfig(WidgetTarget target, WidgetConfig config) {
+    return WidgetConfigState(
+      configs: {...configs, target.storageKey: config},
+    );
   }
 
   @override

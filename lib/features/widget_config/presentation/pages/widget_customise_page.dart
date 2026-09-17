@@ -7,18 +7,27 @@ import 'package:home_widget/home_widget.dart';
 import '../../../../core/theme/kanji_palette.dart';
 import '../../../../core/widgets/section_header.dart';
 import '../../../../core/widgets/washi_background.dart';
+import '../../domain/entities/widget_config.dart';
 import '../../domain/entities/widget_kind.dart';
+import '../../domain/entities/widget_target.dart';
 import '../bloc/widget_config_bloc.dart';
 import '../bloc/widget_config_event.dart';
 import '../bloc/widget_config_state.dart';
 import '../widgets/color_swatch_row.dart';
 import '../widgets/font_selector.dart';
+import '../widgets/kanji_clock_face.dart';
+import '../widgets/option_controls.dart';
 import '../widgets/preview_stage.dart';
 
 class WidgetCustomisePage extends StatefulWidget {
-  final WidgetKind kind;
+  final WidgetTarget target;
+  final bool isConfiguring;
 
-  const WidgetCustomisePage({super.key, required this.kind});
+  const WidgetCustomisePage({
+    super.key,
+    required this.target,
+    this.isConfiguring = false,
+  });
 
   @override
   State<WidgetCustomisePage> createState() => _WidgetCustomisePageState();
@@ -31,6 +40,7 @@ class _WidgetCustomisePageState extends State<WidgetCustomisePage> {
   @override
   void initState() {
     super.initState();
+    context.read<WidgetConfigBloc>().add(WidgetTargetOpened(widget.target));
     _ticker = Timer.periodic(const Duration(seconds: 1), (_) {
       setState(() => _now = DateTime.now());
     });
@@ -42,8 +52,18 @@ class _WidgetCustomisePageState extends State<WidgetCustomisePage> {
     super.dispose();
   }
 
+  void _update(WidgetConfig config) {
+    context.read<WidgetConfigBloc>().add(
+      WidgetConfigChanged(widget.target, config),
+    );
+  }
+
+  Future<void> _finishConfiguring() async {
+    await HomeWidget.finishHomeWidgetConfigure();
+  }
+
   Future<void> _pinWidget() async {
-    final provider = widget.kind.androidProvider;
+    final provider = widget.target.kind.androidProvider;
     if (provider == null) return;
 
     final supported = await HomeWidget.isRequestPinWidgetSupported() ?? false;
@@ -71,7 +91,7 @@ class _WidgetCustomisePageState extends State<WidgetCustomisePage> {
             for (final step in const [
               '1.  Long-press an empty area on your home screen',
               '2.  Tap "Widgets"',
-              '3.  Find "kanji_widget", then drag it onto the home screen',
+              '3.  Find "Kanji Widget", then drag it onto the home screen',
             ])
               Padding(
                 padding: const EdgeInsets.only(bottom: 12),
@@ -86,21 +106,38 @@ class _WidgetCustomisePageState extends State<WidgetCustomisePage> {
   @override
   Widget build(BuildContext context) {
     final scheme = Theme.of(context).colorScheme;
-    final kind = widget.kind;
+    final target = widget.target;
 
     return WashiBackground(
       child: Scaffold(
         backgroundColor: Colors.transparent,
-        appBar: AppBar(title: Text(kind.title)),
+        appBar: AppBar(
+          title: Text(
+            widget.isConfiguring ? 'Set up widget' : target.kind.title,
+          ),
+          automaticallyImplyLeading: !widget.isConfiguring,
+        ),
         body: BlocBuilder<WidgetConfigBloc, WidgetConfigState>(
           builder: (context, state) {
-            final config = state.configFor(kind);
-            final bloc = context.read<WidgetConfigBloc>();
+            final config = state.configFor(target);
 
             return ListView(
               padding: const EdgeInsets.fromLTRB(20, 8, 20, 36),
               children: [
-                PreviewStage(kind: kind, config: config, now: _now),
+                if (!target.isTemplate)
+                  Padding(
+                    padding: const EdgeInsets.only(bottom: 14),
+                    child: Text(
+                      'Editing this widget only — other widgets keep their own '
+                      'look.',
+                      style: TextStyle(
+                        fontSize: 12.5,
+                        height: 1.4,
+                        color: scheme.onSurface.withAlpha(150),
+                      ),
+                    ),
+                  ),
+                PreviewStage(kind: target.kind, config: config, now: _now),
                 const SizedBox(height: 26),
                 SettingsCard(
                   child: Column(
@@ -109,13 +146,76 @@ class _WidgetCustomisePageState extends State<WidgetCustomisePage> {
                       const SectionHeader(label: 'Font'),
                       FontSelector(
                         selected: config.font,
-                        onSelected: (font) => bloc.add(FontChanged(kind, font)),
+                        onSelected: (font) =>
+                            _update(config.copyWith(font: font)),
                       ),
-                      const SizedBox(height: 26),
+                      const SizedBox(height: 22),
                       const SectionHeader(label: 'Size'),
-                      SizeSelector(
+                      SegmentedChoice<WidgetSize>(
+                        values: WidgetSize.values,
                         selected: config.size,
-                        onSelected: (size) => bloc.add(SizeChanged(kind, size)),
+                        labelOf: (value) => widgetSizeLabels[value]!,
+                        onSelected: (size) =>
+                            _update(config.copyWith(size: size)),
+                      ),
+                      const SizedBox(height: 22),
+                      OptionSwitch(
+                        title: 'Bold text',
+                        subtitle: 'Thicker strokes, easier to read at a glance',
+                        value: config.boldText,
+                        onChanged: (value) =>
+                            _update(config.copyWith(boldText: value)),
+                      ),
+                    ],
+                  ),
+                ),
+                const SizedBox(height: 16),
+                SettingsCard(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      const SectionHeader(label: 'Clock format'),
+                      SegmentedChoice<NumeralStyle>(
+                        values: NumeralStyle.values,
+                        selected: config.numeralStyle,
+                        labelOf: (value) => value == NumeralStyle.kanji
+                            ? 'Kanji  十時'
+                            : 'Numbers  10時',
+                        onSelected: (style) =>
+                            _update(config.copyWith(numeralStyle: style)),
+                      ),
+                      const SizedBox(height: 12),
+                      SegmentedChoice<bool>(
+                        values: const [true, false],
+                        selected: config.use24HourFormat,
+                        labelOf: (value) => value ? '24-hour' : '12-hour',
+                        onSelected: (value) =>
+                            _update(config.copyWith(use24HourFormat: value)),
+                      ),
+                      const SizedBox(height: 16),
+                      OptionSwitch(
+                        title: 'Show date',
+                        subtitle: 'Second line with the month and day',
+                        value: config.showDate,
+                        onChanged: (value) =>
+                            _update(config.copyWith(showDate: value)),
+                      ),
+                      OptionSwitch(
+                        title: 'Show weekday',
+                        subtitle: 'Adds the day of the week, e.g. （水）',
+                        value: config.showWeekday,
+                        onChanged: (value) =>
+                            _update(config.copyWith(showWeekday: value)),
+                      ),
+                      OptionSwitch(
+                        title: 'Show seconds',
+                        subtitle:
+                            'Live in this preview. On the home screen Android '
+                            'only lets widgets refresh once a minute, so the '
+                            'seconds there update every minute.',
+                        value: config.showSeconds,
+                        onChanged: (value) =>
+                            _update(config.copyWith(showSeconds: value)),
                       ),
                     ],
                   ),
@@ -133,7 +233,7 @@ class _WidgetCustomisePageState extends State<WidgetCustomisePage> {
                         options: KanjiPalette.texts,
                         selected: config.textColor,
                         onSelected: (color) =>
-                            bloc.add(TextColorChanged(kind, color)),
+                            _update(config.copyWith(textColor: color)),
                       ),
                     ],
                   ),
@@ -149,37 +249,12 @@ class _WidgetCustomisePageState extends State<WidgetCustomisePage> {
                             ? KanjiPalette.nameOf(config.backgroundColor)
                             : 'Transparent',
                       ),
-                      Row(
-                        children: [
-                          Expanded(
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                const Text(
-                                  'Show background',
-                                  style: TextStyle(
-                                    fontSize: 15,
-                                    fontWeight: FontWeight.w600,
-                                  ),
-                                ),
-                                const SizedBox(height: 2),
-                                Text(
-                                  'Turn off for a transparent widget',
-                                  style: TextStyle(
-                                    fontSize: 12,
-                                    color: scheme.onSurface.withAlpha(130),
-                                  ),
-                                ),
-                              ],
-                            ),
-                          ),
-                          Switch(
-                            value: config.showBackground,
-                            onChanged: (value) => bloc.add(
-                              BackgroundVisibilityToggled(kind, value),
-                            ),
-                          ),
-                        ],
+                      OptionSwitch(
+                        title: 'Show background',
+                        subtitle: 'Turn off for a transparent widget',
+                        value: config.showBackground,
+                        onChanged: (value) =>
+                            _update(config.copyWith(showBackground: value)),
                       ),
                       AnimatedCrossFade(
                         duration: const Duration(milliseconds: 200),
@@ -192,7 +267,7 @@ class _WidgetCustomisePageState extends State<WidgetCustomisePage> {
                             options: KanjiPalette.backgrounds,
                             selected: config.backgroundColor,
                             onSelected: (color) =>
-                                bloc.add(BackgroundColorChanged(kind, color)),
+                                _update(config.copyWith(backgroundColor: color)),
                           ),
                         ),
                         secondChild: const SizedBox(width: double.infinity),
@@ -201,20 +276,27 @@ class _WidgetCustomisePageState extends State<WidgetCustomisePage> {
                   ),
                 ),
                 const SizedBox(height: 26),
-                FilledButton(
-                  onPressed: _pinWidget,
-                  child: const Text('Add to Home Screen'),
-                ),
-                const SizedBox(height: 10),
-                Center(
-                  child: TextButton(
-                    onPressed: _showAddInstructions,
-                    child: Text(
-                      'Add it manually instead',
-                      style: TextStyle(color: scheme.onSurface.withAlpha(150)),
+                if (widget.isConfiguring)
+                  FilledButton(
+                    onPressed: _finishConfiguring,
+                    child: const Text('Done'),
+                  )
+                else if (target.isTemplate) ...[
+                  FilledButton(
+                    onPressed: _pinWidget,
+                    child: const Text('Add to Home Screen'),
+                  ),
+                  const SizedBox(height: 10),
+                  Center(
+                    child: TextButton(
+                      onPressed: _showAddInstructions,
+                      child: Text(
+                        'Add it manually instead',
+                        style: TextStyle(color: scheme.onSurface.withAlpha(150)),
+                      ),
                     ),
                   ),
-                ),
+                ],
               ],
             );
           },

@@ -5,8 +5,11 @@ import 'package:home_widget/home_widget.dart';
 import 'core/theme/app_theme.dart';
 import 'features/widget_config/data/kanji_widget_background_callback.dart';
 import 'features/widget_config/data/kanji_widget_hive_bootstrap.dart';
+import 'features/widget_config/domain/entities/widget_kind.dart';
+import 'features/widget_config/domain/entities/widget_target.dart';
 import 'features/widget_config/presentation/bloc/widget_config_bloc.dart';
 import 'features/widget_config/presentation/bloc/widget_config_event.dart';
+import 'features/widget_config/presentation/pages/widget_customise_page.dart';
 import 'features/widget_gallery/presentation/pages/widget_gallery_page.dart';
 
 Future<void> main() async {
@@ -14,21 +17,53 @@ Future<void> main() async {
   await Hive.initFlutter();
   registerWidgetConfigHiveAdapters();
   await HomeWidget.registerInteractivityCallback(kanjiClockBackgroundCallback);
-  runApp(const KanjiWidgetApp());
+
+  final configureId = await HomeWidget.initiallyLaunchedFromHomeWidgetConfigure();
+  final launchUri = await HomeWidget.initiallyLaunchedFromHomeWidget();
+
+  runApp(
+    KanjiWidgetApp(
+      configureTarget: _targetFromConfigureId(configureId),
+      editTarget: _targetFromLaunchUri(launchUri),
+    ),
+  );
+}
+
+WidgetTarget? _targetFromConfigureId(String? configureId) {
+  final widgetId = int.tryParse(configureId ?? '');
+  if (widgetId == null) return null;
+  return WidgetTarget(WidgetKind.clock, widgetId: widgetId);
+}
+
+WidgetTarget? _targetFromLaunchUri(Uri? uri) {
+  if (uri?.host != 'edit') return null;
+  final widgetId = int.tryParse(uri?.queryParameters['widgetId'] ?? '');
+  if (widgetId == null) return null;
+  return WidgetTarget(WidgetKind.clock, widgetId: widgetId);
 }
 
 class KanjiWidgetApp extends StatelessWidget {
-  const KanjiWidgetApp({super.key});
+  final WidgetTarget? configureTarget;
+  final WidgetTarget? editTarget;
+
+  const KanjiWidgetApp({super.key, this.configureTarget, this.editTarget});
 
   @override
   Widget build(BuildContext context) {
+    final target = configureTarget ?? editTarget;
+
     return BlocProvider(
       create: (_) => WidgetConfigBloc()..add(const WidgetConfigLoaded()),
       child: MaterialApp(
         title: 'Kanji Widget',
         debugShowCheckedModeBanner: false,
         theme: buildKanjiTheme(),
-        home: const WidgetGalleryPage(),
+        home: target == null
+            ? const WidgetGalleryPage()
+            : WidgetCustomisePage(
+                target: target,
+                isConfiguring: configureTarget != null,
+              ),
       ),
     );
   }

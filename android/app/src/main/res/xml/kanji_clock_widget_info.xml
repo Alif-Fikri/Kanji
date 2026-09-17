@@ -4,6 +4,8 @@
     android:minHeight="90dp"
     android:updatePeriodMillis="0"
     android:initialLayout="@layout/kanji_clock_widget"
+    android:previewImage="@drawable/kanji_clock_widget_preview"
+    android:configure="id.co.alchemist.kanjiwidget.MainActivity"
     android:resizeMode="horizontal|vertical"
     android:widgetCategory="home_screen">
 </appwidget-provider>

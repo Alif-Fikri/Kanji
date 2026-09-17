@@ -2,27 +2,41 @@ import 'package:hive/hive.dart';
 
 import '../domain/entities/widget_config.dart';
 import '../domain/entities/widget_kind.dart';
+import '../domain/entities/widget_target.dart';
 
 class WidgetConfigLocalDataSource {
   static const String boxName = 'widget_config_box';
 
   Future<Box<WidgetConfig>> _openBox() => Hive.openBox<WidgetConfig>(boxName);
 
-  Future<WidgetConfig> load(WidgetKind kind) async {
+  Future<WidgetConfig> load(WidgetTarget target) async {
     final box = await _openBox();
-    return box.get(kind.name) ?? WidgetConfig.initial();
+    final stored = box.get(target.storageKey);
+    if (stored != null) return stored;
+
+    if (!target.isTemplate) {
+      final template = box.get(WidgetTarget(target.kind).storageKey);
+      if (template != null) return template;
+    }
+    return WidgetConfig.initial();
   }
 
-  Future<Map<WidgetKind, WidgetConfig>> loadAll() async {
+  Future<Map<String, WidgetConfig>> loadTemplates() async {
     final box = await _openBox();
     return {
       for (final kind in WidgetKind.values)
-        kind: box.get(kind.name) ?? WidgetConfig.initial(),
+        WidgetTarget(kind).storageKey:
+            box.get(WidgetTarget(kind).storageKey) ?? WidgetConfig.initial(),
     };
   }
 
-  Future<void> save(WidgetKind kind, WidgetConfig config) async {
+  Future<void> save(WidgetTarget target, WidgetConfig config) async {
     final box = await _openBox();
-    await box.put(kind.name, config);
+    await box.put(target.storageKey, config);
+  }
+
+  Future<void> remove(WidgetTarget target) async {
+    final box = await _openBox();
+    await box.delete(target.storageKey);
   }
 }

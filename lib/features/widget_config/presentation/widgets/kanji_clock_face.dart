@@ -17,34 +17,34 @@ const Map<KanjiFont, String> kanjiFontLabels = {
   KanjiFont.shipporiMincho: 'Shippori Mincho',
 };
 
-const String kanjiFontSampleText = '十時';
-
 const Map<WidgetSize, String> widgetSizeLabels = {
   WidgetSize.small: 'Small',
   WidgetSize.medium: 'Medium',
   WidgetSize.large: 'Large',
 };
 
+const String kanjiFontSampleText = '十時';
+
 class KanjiClockMetrics {
   static const double cornerRadius = 24;
 
   static Size logicalSize(WidgetSize size) => switch (size) {
-        WidgetSize.small => const Size(300, 120),
-        WidgetSize.medium => const Size(320, 165),
-        WidgetSize.large => const Size(340, 215),
-      };
+    WidgetSize.small => const Size(300, 120),
+    WidgetSize.medium => const Size(320, 165),
+    WidgetSize.large => const Size(340, 215),
+  };
 
   static double timeFontSize(WidgetSize size) => switch (size) {
-        WidgetSize.small => 30,
-        WidgetSize.medium => 38,
-        WidgetSize.large => 48,
-      };
+    WidgetSize.small => 30,
+    WidgetSize.medium => 38,
+    WidgetSize.large => 48,
+  };
 
   static double dateFontSize(WidgetSize size) => switch (size) {
-        WidgetSize.small => 15,
-        WidgetSize.medium => 19,
-        WidgetSize.large => 24,
-      };
+    WidgetSize.small => 15,
+    WidgetSize.medium => 19,
+    WidgetSize.large => 24,
+  };
 }
 
 class KanjiClockFace extends StatelessWidget {
@@ -63,12 +63,27 @@ class KanjiClockFace extends StatelessWidget {
         : [
             Shadow(
               blurRadius: 10,
-              color: (textColor.computeLuminance() > 0.5
-                      ? Colors.black
-                      : Colors.white)
-                  .withAlpha(160),
+              color:
+                  (textColor.computeLuminance() > 0.5
+                          ? Colors.black
+                          : Colors.white)
+                      .withAlpha(160),
             ),
           ];
+
+    final fontFamily = kanjiFontFamilies[config.font];
+    final fontWeight = config.boldText ? FontWeight.w700 : FontWeight.w400;
+
+    final timeText = formatKanjiTime(
+      now,
+      style: config.numeralStyle,
+      use24HourFormat: config.use24HourFormat,
+      showSeconds: config.showSeconds,
+    );
+
+    var timeFontSize = KanjiClockMetrics.timeFontSize(config.size);
+    if (config.showSeconds) timeFontSize *= 0.82;
+    if (!config.use24HourFormat) timeFontSize *= 0.88;
 
     return SizedBox(
       width: size.width,
@@ -79,32 +94,47 @@ class KanjiClockFace extends StatelessWidget {
           color: config.showBackground
               ? Color(config.backgroundColor)
               : Colors.transparent,
-          child: Center(
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                Text(
-                  formatKanjiTime(now),
-                  style: TextStyle(
-                    fontFamily: kanjiFontFamilies[config.font],
-                    fontSize: KanjiClockMetrics.timeFontSize(config.size),
-                    height: 1.1,
-                    color: textColor,
-                    shadows: shadows,
+          child: Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 12),
+            child: Center(
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  FittedBox(
+                    child: Text(
+                      timeText,
+                      style: TextStyle(
+                        fontFamily: fontFamily,
+                        fontSize: timeFontSize,
+                        fontWeight: fontWeight,
+                        height: 1.1,
+                        color: textColor,
+                        shadows: shadows,
+                      ),
+                    ),
                   ),
-                ),
-                SizedBox(height: config.size == WidgetSize.small ? 2 : 6),
-                Text(
-                  formatKanjiDate(now),
-                  style: TextStyle(
-                    fontFamily: kanjiFontFamilies[config.font],
-                    fontSize: KanjiClockMetrics.dateFontSize(config.size),
-                    height: 1.1,
-                    color: textColor.withAlpha(210),
-                    shadows: shadows,
-                  ),
-                ),
-              ],
+                  if (config.showDate) ...[
+                    SizedBox(height: config.size == WidgetSize.small ? 2 : 6),
+                    FittedBox(
+                      child: Text(
+                        formatKanjiDate(
+                          now,
+                          style: config.numeralStyle,
+                          showWeekday: config.showWeekday,
+                        ),
+                        style: TextStyle(
+                          fontFamily: fontFamily,
+                          fontSize: KanjiClockMetrics.dateFontSize(config.size),
+                          fontWeight: fontWeight,
+                          height: 1.1,
+                          color: textColor.withAlpha(210),
+                          shadows: shadows,
+                        ),
+                      ),
+                    ),
+                  ],
+                ],
+              ),
             ),
           ),
         ),

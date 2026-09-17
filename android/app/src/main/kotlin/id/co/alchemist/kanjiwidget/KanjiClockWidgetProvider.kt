@@ -4,7 +4,10 @@ import android.appwidget.AppWidgetManager
 import android.content.Context
 import android.content.SharedPreferences
 import android.graphics.BitmapFactory
+import android.net.Uri
+import android.os.Bundle
 import android.widget.RemoteViews
+import es.antonborri.home_widget.HomeWidgetBackgroundIntent
 import es.antonborri.home_widget.HomeWidgetLaunchIntent
 import es.antonborri.home_widget.HomeWidgetProvider
 
@@ -18,11 +21,15 @@ class KanjiClockWidgetProvider : HomeWidgetProvider() {
     ) {
         appWidgetIds.forEach { widgetId ->
             val views = RemoteViews(context.packageName, R.layout.kanji_clock_widget).apply {
-                val pendingIntent =
-                    HomeWidgetLaunchIntent.getActivity(context, MainActivity::class.java)
+                val pendingIntent = HomeWidgetLaunchIntent.getActivity(
+                    context,
+                    MainActivity::class.java,
+                    Uri.parse("kanjiwidget://edit?widgetId=$widgetId"),
+                )
                 setOnClickPendingIntent(R.id.kanji_clock_widget_root, pendingIntent)
 
-                val imagePath = widgetData.getString("clock_image", null)
+                val imagePath = widgetData.getString("clock_image_$widgetId", null)
+                    ?: widgetData.getString("clock_image", null)
                 if (imagePath != null) {
                     setImageViewBitmap(
                         R.id.kanji_clock_widget_image,
@@ -32,6 +39,28 @@ class KanjiClockWidgetProvider : HomeWidgetProvider() {
             }
             appWidgetManager.updateAppWidget(widgetId, views)
         }
+    }
+
+    override fun onAppWidgetOptionsChanged(
+        context: Context,
+        appWidgetManager: AppWidgetManager,
+        appWidgetId: Int,
+        newOptions: Bundle,
+    ) {
+        super.onAppWidgetOptionsChanged(context, appWidgetManager, appWidgetId, newOptions)
+        HomeWidgetBackgroundIntent.getBroadcast(
+            context,
+            Uri.parse("kanjiwidget://resized?widgetId=$appWidgetId"),
+        ).send()
+    }
+
+    override fun onDeleted(context: Context, appWidgetIds: IntArray) {
+        super.onDeleted(context, appWidgetIds)
+        val ids = appWidgetIds.joinToString(",")
+        HomeWidgetBackgroundIntent.getBroadcast(
+            context,
+            Uri.parse("kanjiwidget://deleted?widgetIds=$ids"),
+        ).send()
     }
 
     override fun onEnabled(context: Context) {
