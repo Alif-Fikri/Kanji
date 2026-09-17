@@ -82,7 +82,7 @@ class _WidgetGalleryPageState extends State<WidgetGalleryPage> {
                           borderRadius: BorderRadius.circular(14),
                         ),
                         child: const Text(
-                          '字',
+                          '暦',
                           style: TextStyle(
                             fontFamily: 'ZenOldMincho',
                             fontSize: 24,
