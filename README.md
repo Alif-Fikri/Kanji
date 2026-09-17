@@ -5,16 +5,12 @@ Aplikasi Flutter untuk membuat & mengustomisasi Android home screen widget berte
 - Package: `id.co.alchemist.kanjiwidget`
 - State management: `flutter_bloc`
 
-Lihat [`docs/MVP.md`](docs/MVP.md) untuk skop MVP lengkap, arsitektur kode, status implementasi saat ini, dan langkah selanjutnya.
-
 ## Getting Started
 
 ```bash
 flutter pub get
 flutter run
 ```
-
-Struktur kode mengikuti pola feature-first di `lib/features/<feature>/{domain,data,presentation}` — lihat `docs/MVP.md` untuk detailnya.
 
 A few resources to get you started if this is your first Flutter project:
 
