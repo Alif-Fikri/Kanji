@@ -21,6 +21,27 @@ class WidgetGalleryPage extends StatefulWidget {
   State<WidgetGalleryPage> createState() => _WidgetGalleryPageState();
 }
 
+class _Hint extends StatelessWidget {
+  final String text;
+
+  const _Hint({required this.text});
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 16),
+      child: Text(
+        text,
+        style: TextStyle(
+          fontSize: 12.5,
+          height: 1.4,
+          color: Theme.of(context).colorScheme.onSurface.withAlpha(140),
+        ),
+      ),
+    );
+  }
+}
+
 class _WidgetGalleryPageState extends State<WidgetGalleryPage> {
   late Timer _ticker;
   DateTime _now = DateTime.now();
@@ -130,14 +151,23 @@ class _WidgetGalleryPageState extends State<WidgetGalleryPage> {
                     const SizedBox(height: 28),
                     if (_installed.isNotEmpty) ...[
                       const SectionHeader(label: 'On your home screen'),
-                      for (final info in _installed) ...[
+                      _Hint(
+                        text:
+                            '${_installed.length} widget'
+                            '${_installed.length > 1 ? 's' : ''} placed. '
+                            'Tap one to restyle just that widget.',
+                      ),
+                      for (final (index, info) in _installed.indexed) ...[
                         Builder(
                           builder: (context) {
                             final target = _targetOf(info);
+                            final config = state.configFor(target);
                             return WidgetGalleryTile(
                               kind: target.kind,
-                              config: state.configFor(target),
+                              config: config,
                               now: _now,
+                              title: '${target.kind.title} ${index + 1}',
+                              subtitle: config.summary,
                               onTap: () => _openCustomise(target),
                             );
                           },
@@ -146,6 +176,11 @@ class _WidgetGalleryPageState extends State<WidgetGalleryPage> {
                       ],
                       const SizedBox(height: 4),
                       const SectionHeader(label: 'Add a widget'),
+                      const _Hint(
+                        text:
+                            'Set a starting style, then place a new widget on '
+                            'your home screen.',
+                      ),
                     ],
                     for (final kind in WidgetKind.values) ...[
                       WidgetGalleryTile(

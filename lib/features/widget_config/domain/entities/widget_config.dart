@@ -75,6 +75,17 @@ class WidgetConfig extends Equatable {
     );
   }
 
+  String get summary {
+    final parts = [
+      numeralStyle == NumeralStyle.kanji ? 'Kanji' : 'Numbers',
+      use24HourFormat ? '24-hour' : '12-hour',
+      if (showSeconds) 'seconds',
+      if (!showDate) 'no date',
+      if (showWeekday) 'weekday',
+    ];
+    return parts.join(' · ');
+  }
+
   @override
   List<Object?> get props => [
     font,

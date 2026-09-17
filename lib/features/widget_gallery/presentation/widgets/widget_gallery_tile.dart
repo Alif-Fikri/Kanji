@@ -9,6 +9,8 @@ class WidgetGalleryTile extends StatelessWidget {
   final WidgetConfig config;
   final DateTime now;
   final VoidCallback? onTap;
+  final String? title;
+  final String? subtitle;
 
   const WidgetGalleryTile({
     super.key,
@@ -16,6 +18,8 @@ class WidgetGalleryTile extends StatelessWidget {
     required this.config,
     required this.now,
     this.onTap,
+    this.title,
+    this.subtitle,
   });
 
   @override
@@ -62,7 +66,7 @@ class WidgetGalleryTile extends StatelessWidget {
               children: [
                 Expanded(
                   child: Text(
-                    kind.title,
+                    title ?? kind.title,
                     style: TextStyle(
                       fontSize: 17,
                       fontWeight: FontWeight.w700,
@@ -95,7 +99,7 @@ class WidgetGalleryTile extends StatelessWidget {
             ),
             const SizedBox(height: 2),
             Text(
-              kind.description,
+              subtitle ?? kind.description,
               style: TextStyle(
                 fontSize: 13,
                 height: 1.35,
