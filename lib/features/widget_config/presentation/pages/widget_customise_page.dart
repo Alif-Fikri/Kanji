@@ -284,6 +284,45 @@ class _WidgetCustomisePageState extends State<WidgetCustomisePage> {
                               ? "Today's kanji"
                               : "Today's quote",
                         ),
+                        if (target.kind == WidgetKind.quote) ...[
+                          Builder(
+                            builder: (context) {
+                              final entry = QuoteCache.entryFor(
+                                _now,
+                                overrideIndex: activeOverrideIndex(
+                                  config.contentOverrideDate,
+                                  config.contentOverrideIndex,
+                                  _now,
+                                ),
+                              );
+                              if (entry == null) return const SizedBox();
+                              return Padding(
+                                padding: const EdgeInsets.only(bottom: 10),
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Text(
+                                      entry.japanese,
+                                      style: const TextStyle(
+                                        fontSize: 16,
+                                        fontWeight: FontWeight.w600,
+                                      ),
+                                    ),
+                                    const SizedBox(height: 4),
+                                    Text(
+                                      entry.english,
+                                      style: TextStyle(
+                                        fontSize: 13,
+                                        fontStyle: FontStyle.italic,
+                                        color: scheme.onSurface.withAlpha(180),
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              );
+                            },
+                          ),
+                        ],
                         Text(
                           'Changes daily on its own. Not feeling this one? '
                           "Shuffle for another — it'll still change "
