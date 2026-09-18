@@ -23,6 +23,7 @@ import '../widgets/kanji_clock_face.dart';
 import '../widgets/option_controls.dart';
 import '../widgets/placed_widget_row.dart';
 import '../widgets/preview_stage.dart';
+import '../widgets/template_picker.dart';
 
 class WidgetCustomisePage extends StatefulWidget {
   final WidgetTarget target;
@@ -249,6 +250,30 @@ class _WidgetCustomisePageState extends State<WidgetCustomisePage> {
                   ),
                   const SizedBox(height: 16),
                 ],
+                SettingsCard(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      const SectionHeader(label: 'Templates'),
+                      Text(
+                        'Apply a ready-made look — font, text colour and '
+                        'background all at once.',
+                        style: TextStyle(
+                          fontSize: 12.5,
+                          height: 1.4,
+                          color: scheme.onSurface.withAlpha(140),
+                        ),
+                      ),
+                      const SizedBox(height: 12),
+                      TemplatePicker(
+                        config: config,
+                        onSelected: (template) =>
+                            _update(template.applyTo(config)),
+                      ),
+                    ],
+                  ),
+                ),
+                const SizedBox(height: 16),
                 if (target.kind != WidgetKind.clock) ...[
                   SettingsCard(
                     child: Column(
